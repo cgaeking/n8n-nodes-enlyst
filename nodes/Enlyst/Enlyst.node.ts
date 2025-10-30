@@ -160,6 +160,11 @@ export class Enlyst implements INodeType {
 						const options: IHttpRequestOptions = {
 							method: 'GET',
 							url: `${baseUrl}/projects`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 						};
 						responseData = await this.helpers.httpRequest(options);
 					} else if (resource === 'project' && operation === 'getById') {
