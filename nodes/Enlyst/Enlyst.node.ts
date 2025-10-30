@@ -150,13 +150,47 @@ export class Enlyst implements INodeType {
 
 				// If no custom handling above, fall back to default routing
 				if (responseData === undefined) {
-					// This will use the routing configuration from the node properties
-					const responseRaw = await this.helpers.httpRequestWithAuthentication.call(
-						this, 
-						'enlystApi', 
-						{} as IHttpRequestOptions
-					);
-					responseData = responseRaw;
+					// Explicitly handle the routing based on resource and operation
+					if (resource === 'project' && operation === 'getAll') {
+						const options: IHttpRequestOptions = {
+							method: 'GET',
+							url: '/projects',
+						};
+						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+					} else if (resource === 'project' && operation === 'getById') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+						const options: IHttpRequestOptions = {
+							method: 'GET',
+							url: `/projects/${projectId}`,
+						};
+						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+					} else if (resource === 'project' && operation === 'create') {
+						const name = this.getNodeParameter('name', i) as string;
+						const options: IHttpRequestOptions = {
+							method: 'POST',
+							url: '/projects',
+							body: { name },
+						};
+						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+					} else if (resource === 'project' && operation === 'update') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+						const updateName = this.getNodeParameter('updateName', i) as string;
+						const options: IHttpRequestOptions = {
+							method: 'PUT',
+							url: `/projects/${projectId}`,
+							body: { name: updateName },
+						};
+						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+					} else if (resource === 'project' && operation === 'delete') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+						const options: IHttpRequestOptions = {
+							method: 'DELETE',
+							url: `/projects/${projectId}`,
+						};
+						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+					} else {
+						throw new Error(`Unknown operation: ${operation} for resource: ${resource}`);
+					}
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(
