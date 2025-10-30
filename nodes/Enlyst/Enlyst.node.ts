@@ -153,42 +153,78 @@ export class Enlyst implements INodeType {
 				if (responseData === undefined) {
 					// Explicitly handle the routing based on resource and operation
 					if (resource === 'project' && operation === 'getAll') {
+						// Get the base URL from credentials
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+						
 						const options: IHttpRequestOptions = {
 							method: 'GET',
-							url: '/projects',
+							url: `${baseUrl}/projects`,
 						};
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					} else if (resource === 'project' && operation === 'getById') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
 						const projectId = this.getNodeParameter('projectId', i) as string;
+						
 						const options: IHttpRequestOptions = {
 							method: 'GET',
-							url: `/projects/${projectId}`,
+							url: `${baseUrl}/projects/${projectId}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 						};
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					} else if (resource === 'project' && operation === 'create') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
 						const name = this.getNodeParameter('name', i) as string;
+						
 						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: '/projects',
+							url: `${baseUrl}/projects`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 							body: { name },
 						};
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					} else if (resource === 'project' && operation === 'update') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
 						const projectId = this.getNodeParameter('projectId', i) as string;
 						const updateName = this.getNodeParameter('updateName', i) as string;
+						
 						const options: IHttpRequestOptions = {
 							method: 'PUT',
-							url: `/projects/${projectId}`,
+							url: `${baseUrl}/projects/${projectId}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 							body: { name: updateName },
 						};
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					} else if (resource === 'project' && operation === 'delete') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
 						const projectId = this.getNodeParameter('projectId', i) as string;
+						
 						const options: IHttpRequestOptions = {
 							method: 'DELETE',
-							url: `/projects/${projectId}`,
+							url: `${baseUrl}/projects/${projectId}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 						};
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					} else {
 						throw new ApplicationError(`Unknown operation: ${operation} for resource: ${resource}`);
 					}
