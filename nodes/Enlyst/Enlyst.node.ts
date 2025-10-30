@@ -78,7 +78,36 @@ export class Enlyst implements INodeType {
 				if (resource === 'lead') {
 					const projectId = this.getNodeParameter('projectId', i) as string;
 					
-					if (operation === 'enrichLeads') {
+					if (operation === 'getProjectData') {
+						const page = this.getNodeParameter('page', i) as number;
+						const limit = this.getNodeParameter('limit', i) as number;
+						const status = this.getNodeParameter('status', i) as string;
+						
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+						
+						const queryParams = new URLSearchParams({
+							page: page.toString(),
+							limit: limit.toString(),
+						});
+						
+						if (status) {
+							queryParams.append('status', status);
+						}
+						
+						const options: IHttpRequestOptions = {
+							method: 'GET',
+							url: `${baseUrl}/projects/${projectId}/data?${queryParams.toString()}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+						};
+
+						responseData = await this.helpers.httpRequest(options);
+						
+					} else if (operation === 'enrichLeads') {
 						const enrichmentType = this.getNodeParameter('enrichmentType', i) as string;
 						const requestBody: IDataObject = {};
 
