@@ -1,11 +1,20 @@
 {
   "name": "n8n-nodes-enlyst",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "n8n node for Enlyst lead enrichment and data management platform with webhook trigger",
   "license": "MIT",
   "homepage": "https://enlyst.app",
-  "keywords": ["n8n-community-node-package", "enlyst", "lead-enrichment", "crm", "data-management"],
-  "author": { "name": "Enlyst", "email": "info@enlyst.de" },
+  "keywords": [
+    "n8n-community-node-package",
+    "enlyst",
+    "lead-enrichment",
+    "crm",
+    "data-management"
+  ],
+  "author": {
+    "name": "Enlyst",
+    "email": "info@enlyst.de"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/cgaeking/n8n-nodes-enlyst.git"
@@ -19,10 +28,14 @@
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": ["dist/credentials/EnlystApi.credentials.js"],
+    "credentials": [
+      "dist/credentials/EnlystApi.credentials.js"
+    ],
     "nodes": [
       "dist/nodes/Enlyst/Enlyst.node.js",
       "dist/nodes/Enlyst/EnlystTrigger.node.js"
@@ -35,5 +48,7 @@
     "release-it": "^19.0.4",
     "typescript": "5.9.2"
   },
-  "peerDependencies": { "n8n-workflow": "*" }
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
 }
