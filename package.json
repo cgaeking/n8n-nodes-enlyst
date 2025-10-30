@@ -8,7 +8,7 @@
   "author": { "name": "Enlyst", "email": "info@enlyst.de" },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cgaeking/enlyst.git"
+    "url": "https://github.com/cgaeking/n8n-nodes-enlyst.git"
   },
   "scripts": {
     "build": "n8n-node build",
