@@ -6,6 +6,7 @@ import {
 	type INodeTypeDescription,
 	type IHttpRequestOptions,
 	type IDataObject,
+	ApplicationError,
 } from 'n8n-workflow';
 import { projectDescription } from './resources/project';
 import { leadDescription } from './resources/lead';
@@ -189,7 +190,7 @@ export class Enlyst implements INodeType {
 						};
 						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
 					} else {
-						throw new Error(`Unknown operation: ${operation} for resource: ${resource}`);
+						throw new ApplicationError(`Unknown operation: ${operation} for resource: ${resource}`);
 					}
 				}
 
