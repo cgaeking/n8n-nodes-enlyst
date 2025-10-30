@@ -49,10 +49,10 @@ export const projectOperations: INodeProperties[] = [
 				},
 			},
 			{
-				name: 'Get Many',
+				name: 'List Projects',
 				value: 'getAll',
-				description: 'Retrieve many projects',
-				action: 'Get many projects',
+				description: 'List all projects',
+				action: 'List projects',
 				routing: {
 					request: {
 						method: 'GET',
