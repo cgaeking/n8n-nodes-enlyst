@@ -192,11 +192,11 @@ export const leadDescription: INodeProperties[] = [
 		},
 	},
 
-	// Single Row ID
+	// Single Row - Company Name
 	{
-		displayName: 'Row ID',
-		name: 'rowId',
-		type: 'number',
+		displayName: 'Company Name',
+		name: 'company',
+		type: 'string',
 		displayOptions: {
 			show: {
 				resource: ['lead'],
@@ -205,12 +205,35 @@ export const leadDescription: INodeProperties[] = [
 			},
 		},
 		required: true,
-		default: 1,
-		description: 'ID of the specific row to enrich',
+		default: '',
+		placeholder: 'Acme Corporation',
+		description: 'Name of the company to enrich',
 		routing: {
 			send: {
 				type: 'body',
-				property: 'rowId',
+				property: 'company',
+			},
+		},
+	},
+	// Single Row - Website (Optional)
+	{
+		displayName: 'Website',
+		name: 'website',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['enrichLeads'],
+				enrichmentType: ['single'],
+			},
+		},
+		default: '',
+		placeholder: 'https://example.com',
+		description: 'Website of the company (optional, will be auto-discovered if not provided)',
+		routing: {
+			send: {
+				type: 'body',
+				property: 'website',
 			},
 		},
 	},

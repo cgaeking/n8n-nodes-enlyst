@@ -123,7 +123,11 @@ export class Enlyst implements INodeType {
 
 						// Build request body based on enrichment type
 						if (enrichmentType === 'single') {
-							requestBody.rowId = this.getNodeParameter('rowId', i);
+							requestBody.company = this.getNodeParameter('company', i);
+							const website = this.getNodeParameter('website', i, '') as string;
+							if (website) {
+								requestBody.website = website;
+							}
 						} else if (enrichmentType === 'filtered') {
 							requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
 							requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
@@ -133,13 +137,21 @@ export class Enlyst implements INodeType {
 							requestBody.dryRun = true;
 						}
 
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+
 						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: `/projects/${projectId}/enrich`,
+							url: `${baseUrl}/projects/${projectId}/enrich`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 							body: requestBody,
 						};
 
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 
 					} else if (operation === 'uploadCsv') {
 						// For CSV upload, we need to handle file upload differently
@@ -171,6 +183,9 @@ export class Enlyst implements INodeType {
 						const statusFilter = this.getNodeParameter('downloadStatusFilter', i) as string[];
 						const hasEmailFilter = this.getNodeParameter('hasEmailFilter', i) as boolean;
 
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+
 						const requestBody = {
 							filters: {
 								status: statusFilter,
@@ -180,11 +195,16 @@ export class Enlyst implements INodeType {
 
 						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: `/projects/${projectId}/download-csv`,
+							url: `${baseUrl}/projects/${projectId}/download-csv`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
 							body: requestBody,
 						};
 
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
+						responseData = await this.helpers.httpRequest(options);
 					}
 				}
 
