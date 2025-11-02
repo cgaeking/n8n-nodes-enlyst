@@ -79,20 +79,30 @@ export class Enlyst implements INodeType {
 					const projectId = this.getNodeParameter('projectId', i) as string;
 					
 					if (operation === 'getProjectData') {
-						const page = this.getNodeParameter('page', i) as number;
-						const limit = this.getNodeParameter('limit', i) as number;
-						const status = this.getNodeParameter('status', i) as string;
+						const page = this.getNodeParameter('page', i, null) as number | null;
+						const limit = this.getNodeParameter('limit', i, null) as number | null;
+						const statuses = this.getNodeParameter('status', i, []) as string[];
 						
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
 						
-						const queryParams = new URLSearchParams({
-							page: page.toString(),
-							limit: limit.toString(),
-						});
+						const queryParams = new URLSearchParams();
 						
-						if (status) {
-							queryParams.append('status', status);
+						// Only add page and limit if they're specified
+						// If both are omitted, the API returns all records
+						if (page !== null && page > 0) {
+							queryParams.append('page', page.toString());
+						}
+						
+						if (limit !== null && limit > 0) {
+							queryParams.append('limit', limit.toString());
+						}
+						
+						// Add multiple status filters if specified
+						if (statuses && statuses.length > 0 && !statuses.includes('all')) {
+							statuses.forEach(status => {
+								queryParams.append('status', status);
+							});
 						}
 						
 						const options: IHttpRequestOptions = {
@@ -227,24 +237,40 @@ export class Enlyst implements INodeType {
 							body: { name },
 						};
 						responseData = await this.helpers.httpRequest(options);
-					} else if (resource === 'project' && operation === 'update') {
-						const credentials = await this.getCredentials('enlystApi');
-						const baseUrl = credentials.baseUrl as string;
-						const projectId = this.getNodeParameter('projectId', i) as string;
-						const updateName = this.getNodeParameter('updateName', i) as string;
-						
-						const options: IHttpRequestOptions = {
-							method: 'PUT',
-							url: `${baseUrl}/projects/${projectId}`,
-							headers: {
-								'Authorization': `Bearer ${credentials.accessToken}`,
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: { name: updateName },
-						};
-						responseData = await this.helpers.httpRequest(options);
-					} else if (resource === 'project' && operation === 'delete') {
+				} else if (resource === 'project' && operation === 'update') {
+					const credentials = await this.getCredentials('enlystApi');
+					const baseUrl = credentials.baseUrl as string;
+					const projectId = this.getNodeParameter('projectId', i) as string;
+					const updateName = this.getNodeParameter('updateName', i) as string;
+					const description = this.getNodeParameter('description', i, '') as string;
+					const pitchlaneIntegration = this.getNodeParameter('pitchlaneIntegration', i, false) as boolean;
+					const customPrompt1 = this.getNodeParameter('customPrompt1', i, '') as string;
+					const customPrompt2 = this.getNodeParameter('customPrompt2', i, '') as string;
+					const targetLanguage = this.getNodeParameter('targetLanguage', i, 'de') as string;
+					const generalWebhooks = this.getNodeParameter('generalWebhooks', i, false) as boolean;
+					const enrichmentWebhookUrl = this.getNodeParameter('enrichmentWebhookUrl', i, '') as string;
+					
+					const body: IDataObject = { name: updateName };
+					if (description) body.description = description;
+					if (pitchlaneIntegration) body.pitchlaneIntegration = pitchlaneIntegration;
+					if (customPrompt1) body.customPrompt1 = customPrompt1;
+					if (customPrompt2) body.customPrompt2 = customPrompt2;
+					if (targetLanguage) body.targetLanguage = targetLanguage;
+					if (generalWebhooks) body.generalWebhooks = generalWebhooks;
+					if (enrichmentWebhookUrl) body.enrichmentWebhookUrl = enrichmentWebhookUrl;
+					
+					const options: IHttpRequestOptions = {
+						method: 'PATCH',
+						url: `${baseUrl}/projects/${projectId}`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body,
+					};
+					responseData = await this.helpers.httpRequest(options);
+				} else if (resource === 'project' && operation === 'delete') {
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
 						const projectId = this.getNodeParameter('projectId', i) as string;

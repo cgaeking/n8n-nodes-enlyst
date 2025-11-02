@@ -13,10 +13,10 @@ export const leadDescription: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Project Data',
+				name: 'Get Leads',
 				value: 'getProjectData',
-				description: 'Get project data with pagination and filtering',
-				action: 'Get project data',
+				description: 'Get leads with pagination and filtering',
+				action: 'Get leads',
 			},
 			{
 				name: 'Enrich Leads',
@@ -68,8 +68,8 @@ export const leadDescription: INodeProperties[] = [
 				operation: ['getProjectData'],
 			},
 		},
-		default: 1,
-		description: 'Page number for pagination',
+		default: 0,
+		description: 'Page number for pagination (0 = get all leads)',
 		routing: {
 			request: {
 				method: 'GET',
@@ -85,7 +85,7 @@ export const leadDescription: INodeProperties[] = [
 		name: 'limit',
 		type: 'number',
 		typeOptions: {
-			minValue: 1,
+			minValue: 0,
 		},
 		displayOptions: {
 			show: {
@@ -93,8 +93,8 @@ export const leadDescription: INodeProperties[] = [
 				operation: ['getProjectData'],
 			},
 		},
-		default: 50,
-		description: 'Max number of results to return',
+		default: 0,
+		description: 'Max number of results to return (0 = get all leads)',
 		routing: {
 			send: {
 				type: 'query',
@@ -105,7 +105,7 @@ export const leadDescription: INodeProperties[] = [
 	{
 		displayName: 'Status Filter',
 		name: 'status',
-		type: 'options',
+		type: 'multiOptions',
 		displayOptions: {
 			show: {
 				resource: ['lead'],
@@ -115,7 +115,7 @@ export const leadDescription: INodeProperties[] = [
 		options: [
 			{
 				name: 'All',
-				value: '',
+				value: 'all',
 			},
 			{
 				name: 'Completed',
@@ -138,8 +138,8 @@ export const leadDescription: INodeProperties[] = [
 				value: 'stopped',
 			},
 		],
-		default: '',
-		description: 'Filter by processing status',
+		default: [],
+		description: 'Filter by processing status (multiple selection possible)',
 		routing: {
 			send: {
 				type: 'query',
