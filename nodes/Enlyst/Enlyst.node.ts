@@ -76,7 +76,9 @@ export class Enlyst implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				if (resource === 'lead') {
-					const projectId = this.getNodeParameter('projectId', i) as string;
+					// Project ID is optional for single enrichment
+					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
+					const projectId = (enrichmentType === 'single') ? '' : this.getNodeParameter('projectId', i) as string;
 					
 					if (operation === 'getProjectData') {
 						const page = this.getNodeParameter('page', i, null) as number | null;
@@ -118,42 +120,45 @@ export class Enlyst implements INodeType {
 						responseData = await this.helpers.httpRequest(options);
 						
 					} else if (operation === 'enrichLeads') {
-						const enrichmentType = this.getNodeParameter('enrichmentType', i) as string;
 						const requestBody: IDataObject = {};
+						const enrichCreds = await this.getCredentials('enlystApi');
+						const enrichBaseUrl = enrichCreds.baseUrl as string;
+						let enrichUrl = '';
 
 						// Build request body based on enrichment type
 						if (enrichmentType === 'single') {
+							// Standalone enrichment - no project needed
 							requestBody.company = this.getNodeParameter('company', i);
 							const website = this.getNodeParameter('website', i, '') as string;
 							if (website) {
 								requestBody.website = website;
 							}
-						} else if (enrichmentType === 'filtered') {
-							requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
-							requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
-							requestBody.startRow = this.getNodeParameter('startRow', i);
-							requestBody.maxRows = this.getNodeParameter('maxRows', i);
-						} else if (enrichmentType === 'dryRun') {
-							requestBody.dryRun = true;
+							enrichUrl = `${enrichBaseUrl}/enrich`;
+						} else {
+							// Project-based enrichment
+							if (enrichmentType === 'filtered') {
+								requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
+								requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
+								requestBody.startRow = this.getNodeParameter('startRow', i);
+								requestBody.maxRows = this.getNodeParameter('maxRows', i);
+							} else if (enrichmentType === 'dryRun') {
+								requestBody.dryRun = true;
+							}
+							enrichUrl = `${enrichBaseUrl}/projects/${projectId}/enrich`;
 						}
-
-						const credentials = await this.getCredentials('enlystApi');
-						const baseUrl = credentials.baseUrl as string;
 
 						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: `${baseUrl}/projects/${projectId}/enrich`,
+							url: enrichUrl,
 							headers: {
-								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Authorization': `Bearer ${enrichCreds.accessToken}`,
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
 							body: requestBody,
 						};
 
-						responseData = await this.helpers.httpRequest(options);
-
-					} else if (operation === 'uploadCsv') {
+						responseData = await this.helpers.httpRequest(options);					} else if (operation === 'uploadCsv') {
 						// For CSV upload, we need to handle file upload differently
 						const companyColumn = this.getNodeParameter('companyColumn', i) as string;
 						const websiteColumn = this.getNodeParameter('websiteColumn', i) as string;

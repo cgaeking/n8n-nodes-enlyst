@@ -40,7 +40,7 @@ export const leadDescription: INodeProperties[] = [
 		default: 'getProjectData',
 	},
 
-	// Project ID (required for all operations)
+	// Project ID (required for most operations, optional for single enrichment)
 	{
 		displayName: 'Project ID',
 		name: 'projectId',
@@ -49,6 +49,11 @@ export const leadDescription: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['lead'],
+				operation: ['getProjectData', 'enrichLeads', 'uploadCsv', 'downloadCsv'],
+			},
+			hide: {
+				operation: ['enrichLeads'],
+				enrichmentType: ['single'],
 			},
 		},
 		default: '',
