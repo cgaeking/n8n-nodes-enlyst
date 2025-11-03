@@ -1,0 +1,24 @@
+{
+  "git": {
+    "commitMessage": "Release ${version}",
+    "tagName": "${version}",
+    "requireCleanWorkingDir": true,
+    "requireBranch": "main",
+    "push": true,
+    "tag": true
+  },
+  "github": {
+    "release": true,
+    "releaseName": "Release ${version}",
+    "autoGenerate": true
+  },
+  "npm": {
+    "publish": true,
+    "skipChecks": false
+  },
+  "hooks": {
+    "before:init": ["npm run test"],
+    "after:bump": ["npm run build"],
+    "after:release": "echo Successfully released ${version}"
+  }
+}
