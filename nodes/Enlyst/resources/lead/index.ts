@@ -40,12 +40,12 @@ export const leadDescription: INodeProperties[] = [
 		default: 'getProjectData',
 	},
 
-	// Project ID (required for most operations, optional for single enrichment)
+	// Project ID (required for all lead operations)
 	{
 		displayName: 'Project ID',
 		name: 'projectId',
 		type: 'string',
-		required: false,
+		required: true,
 		displayOptions: {
 			show: {
 				resource: ['lead'],
@@ -53,7 +53,7 @@ export const leadDescription: INodeProperties[] = [
 			},
 		},
 		default: '',
-		description: 'ID of the project (optional for Single Row enrichment - if omitted, enrichment is not saved)',
+		description: 'ID of the project to work with',
 	},
 
 	/* -------------------------------------------------------------------------- */
@@ -169,11 +169,6 @@ export const leadDescription: INodeProperties[] = [
 				description: 'Enrich all eligible rows in the project',
 			},
 			{
-				name: 'Single Row',
-				value: 'single',
-				description: 'Enrich a specific row by ID',
-			},
-			{
 				name: 'Filtered Enrichment',
 				value: 'filtered',
 				description: 'Enrich with specific filters and criteria',
@@ -189,52 +184,6 @@ export const leadDescription: INodeProperties[] = [
 			request: {
 				method: 'POST',
 				url: '=/projects/{{$parameter.projectId}}/enrich',
-			},
-		},
-	},
-
-	// Single Row - Company Name
-	{
-		displayName: 'Company Name',
-		name: 'company',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['enrichLeads'],
-				enrichmentType: ['single'],
-			},
-		},
-		required: true,
-		default: '',
-		placeholder: 'Acme Corporation',
-		description: 'Name of the company to enrich',
-		routing: {
-			send: {
-				type: 'body',
-				property: 'company',
-			},
-		},
-	},
-	// Single Row - Website (Optional)
-	{
-		displayName: 'Website',
-		name: 'website',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['enrichLeads'],
-				enrichmentType: ['single'],
-			},
-		},
-		default: '',
-		placeholder: 'https://example.com',
-		description: 'Website of the company (optional, will be auto-discovered if not provided)',
-		routing: {
-			send: {
-				type: 'body',
-				property: 'website',
 			},
 		},
 	},

@@ -25,6 +25,18 @@ export const projectOperations: INodeProperties[] = [
 				},
 			},
 			{
+				name: 'Create or Update',
+				value: 'createOrUpdate',
+				description: 'Create a new project or update existing one by name',
+				action: 'Create or update a project',
+			},
+			{
+				name: 'Enrich Company',
+				value: 'enrichCompany',
+				description: 'Complete enrichment workflow: create/update project, add company, enrich, and wait for results (synchronous)',
+				action: 'Enrich a company and wait for results',
+			},
+			{
 				name: 'Delete',
 				value: 'delete',
 				description: 'Delete a project',
@@ -118,6 +130,310 @@ export const projectFields: INodeProperties[] = [
 		default: '',
 		required: true,
 		description: 'ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            project:createOrUpdate                          */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Name',
+		name: 'name',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: '',
+		required: true,
+		description: 'Name of the project (used to find existing project)',
+	},
+	{
+		displayName: 'Description',
+		name: 'description',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: '',
+		description: 'Project description',
+	},
+	{
+		displayName: 'Pitchlane Integration',
+		name: 'pitchlaneIntegration',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: false,
+		description: 'Whether to enable Pitchlane integration',
+	},
+	{
+		displayName: 'Custom Prompt 1',
+		name: 'customPrompt1',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: '',
+		description: 'First custom prompt for AI enrichment',
+	},
+	{
+		displayName: 'Custom Prompt 2',
+		name: 'customPrompt2',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: '',
+		description: 'Second custom prompt for AI enrichment',
+	},
+	{
+		displayName: 'Target Language',
+		name: 'targetLanguage',
+		type: 'options',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		options: [
+			{
+				name: 'Deutsch',
+				value: 'de',
+			},
+			{
+				name: 'English',
+				value: 'en',
+			},
+			{
+				name: 'Français',
+				value: 'fr',
+			},
+			{
+				name: 'Español',
+				value: 'es',
+			},
+			{
+				name: 'Italiano',
+				value: 'it',
+			},
+			{
+				name: 'Nederlands',
+				value: 'nl',
+			},
+			{
+				name: 'Português',
+				value: 'pt',
+			},
+			{
+				name: 'Polski',
+				value: 'pl',
+			},
+		],
+		default: 'de',
+		description: 'Target language for enrichment',
+	},
+	{
+		displayName: 'General Webhooks',
+		name: 'generalWebhooks',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: false,
+		description: 'Whether to enable general webhooks',
+	},
+	{
+		displayName: 'Enrichment Webhook URL',
+		name: 'enrichmentWebhookUrl',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['createOrUpdate'],
+			},
+		},
+		default: '',
+		placeholder: 'e.g., {{ $("Webhook").item.json.webhookUrl }}',
+		description: 'n8n webhook URL to trigger when enrichment completes. Add a Webhook node and reference its URL here using an expression.',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            project:enrichCompany                           */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project Name',
+		name: 'projectName',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		required: true,
+		description: 'Name of the project (will be created or updated). Enrichment results will be sent to the webhook when complete.',
+	},
+	{
+		displayName: 'Company',
+		name: 'company',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		required: true,
+		description: 'Company name to enrich (required: company or website)',
+	},
+	{
+		displayName: 'Website',
+		name: 'website',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		description: 'Company website to enrich (optional but recommended)',
+	},
+	{
+		displayName: 'Description',
+		name: 'projectDescription',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		description: 'Project description',
+	},
+	{
+		displayName: 'Pitchlane Integration',
+		name: 'pitchlaneIntegrationEnrich',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: false,
+		description: 'Whether to enable Pitchlane integration',
+	},
+	{
+		displayName: 'Custom Prompt 1',
+		name: 'customPrompt1Enrich',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		description: 'First custom prompt for AI enrichment',
+	},
+	{
+		displayName: 'Custom Prompt 2',
+		name: 'customPrompt2Enrich',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		description: 'Second custom prompt for AI enrichment',
+	},
+	{
+		displayName: 'Target Language',
+		name: 'targetLanguageEnrich',
+		type: 'options',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		options: [
+			{
+				name: 'Deutsch',
+				value: 'de',
+			},
+			{
+				name: 'English',
+				value: 'en',
+			},
+			{
+				name: 'Français',
+				value: 'fr',
+			},
+			{
+				name: 'Español',
+				value: 'es',
+			},
+			{
+				name: 'Italiano',
+				value: 'it',
+			},
+			{
+				name: 'Nederlands',
+				value: 'nl',
+			},
+			{
+				name: 'Português',
+				value: 'pt',
+			},
+			{
+				name: 'Polski',
+				value: 'pl',
+			},
+		],
+		default: 'de',
+		description: 'Target language for enrichment',
+	},
+	{
+		displayName: 'Enrichment Webhook URL',
+		name: 'enrichmentWebhookUrlEnrich',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['enrichCompany'],
+			},
+		},
+		default: '',
+		required: true,
+		placeholder: 'Copy Production URL from Webhook Trigger node',
+		description: 'Webhook URL where enrichment results will be sent. Add a Webhook Trigger node BEFORE this node, copy its Production URL and paste it here.',
+		hint: 'Tip: In the Webhook node, click on "Production URL" and copy the URL',
 	},
 
 	/* -------------------------------------------------------------------------- */

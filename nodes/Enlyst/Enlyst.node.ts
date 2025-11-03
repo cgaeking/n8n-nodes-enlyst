@@ -76,9 +76,8 @@ export class Enlyst implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				if (resource === 'lead') {
-					// Project ID is optional for single enrichment (standalone mode)
 					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
-					const projectId = this.getNodeParameter('projectId', i, '') as string;
+					const projectId = this.getNodeParameter('projectId', i) as string;
 					
 					if (operation === 'getProjectData') {
 						const page = this.getNodeParameter('page', i, null) as number | null;
@@ -121,50 +120,25 @@ export class Enlyst implements INodeType {
 						
 					} else if (operation === 'enrichLeads') {
 						const requestBody: IDataObject = {};
-						const enrichCreds = await this.getCredentials('enlystApi');
-						const enrichBaseUrl = enrichCreds.baseUrl as string;
-						let enrichUrl = '';
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
 
 						// Build request body based on enrichment type
-						if (enrichmentType === 'single') {
-							// Single row enrichment by company name
-							requestBody.company = this.getNodeParameter('company', i);
-							const website = this.getNodeParameter('website', i, '') as string;
-							if (website) {
-								requestBody.website = website;
-							}
-							
-							// If Project ID is provided, create row in project and enrich
-							// If no Project ID, use standalone enrichment (no storage)
-							if (projectId) {
-								enrichUrl = `${enrichBaseUrl}/projects/${projectId}/enrich`;
-							} else {
-								enrichUrl = `${enrichBaseUrl}/enrich`;
-							}
-						} else {
-							// All other enrichment types require a project
-							if (!projectId) {
-								throw new ApplicationError('Project ID is required for this enrichment type');
-							}
-							
-							if (enrichmentType === 'filtered') {
-								requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
-								requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
-								requestBody.startRow = this.getNodeParameter('startRow', i);
-								requestBody.maxRows = this.getNodeParameter('maxRows', i);
-							} else if (enrichmentType === 'dryRun') {
-								requestBody.dryRun = true;
-							}
-							// 'all' enrichment type needs no additional parameters
-							
-							enrichUrl = `${enrichBaseUrl}/projects/${projectId}/enrich`;
+						if (enrichmentType === 'filtered') {
+							requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
+							requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
+							requestBody.startRow = this.getNodeParameter('startRow', i);
+							requestBody.maxRows = this.getNodeParameter('maxRows', i);
+						} else if (enrichmentType === 'dryRun') {
+							requestBody.dryRun = true;
 						}
+						// 'all' enrichment type needs no additional parameters
 
 						const options: IHttpRequestOptions = {
 							method: 'POST',
-							url: enrichUrl,
+							url: `${baseUrl}/projects/${projectId}/enrich`,
 							headers: {
-								'Authorization': `Bearer ${enrichCreds.accessToken}`,
+								'Authorization': `Bearer ${credentials.accessToken}`,
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
@@ -275,6 +249,189 @@ export class Enlyst implements INodeType {
 							body: { name },
 						};
 						responseData = await this.helpers.httpRequest(options);
+				} else if (resource === 'project' && operation === 'createOrUpdate') {
+					const credentials = await this.getCredentials('enlystApi');
+					const baseUrl = credentials.baseUrl as string;
+					const name = this.getNodeParameter('name', i) as string;
+					const description = this.getNodeParameter('description', i, '') as string;
+					const pitchlaneIntegration = this.getNodeParameter('pitchlaneIntegration', i, false) as boolean;
+					const customPrompt1 = this.getNodeParameter('customPrompt1', i, '') as string;
+					const customPrompt2 = this.getNodeParameter('customPrompt2', i, '') as string;
+					const targetLanguage = this.getNodeParameter('targetLanguage', i, 'de') as string;
+					const enrichmentWebhookUrl = this.getNodeParameter('enrichmentWebhookUrl', i, '') as string;
+					
+					// Always enable general webhooks
+					const generalWebhooks = true;
+					
+					// First, get all projects to search by name
+					const getOptions: IHttpRequestOptions = {
+						method: 'GET',
+						url: `${baseUrl}/projects`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+					};
+					const allProjects = await this.helpers.httpRequest(getOptions) as IDataObject;
+					const projects = allProjects.projects as IDataObject[];
+					
+					// Find project by name (case-insensitive)
+					const existingProject = projects?.find((p: IDataObject) => 
+						(p.name as string).toLowerCase() === name.toLowerCase()
+					);
+					
+					// Build body with all optional fields
+					const body: IDataObject = { name };
+					if (description) body.description = description;
+					if (pitchlaneIntegration) body.pitchlaneIntegration = pitchlaneIntegration;
+					if (customPrompt1) body.customPrompt1 = customPrompt1;
+					if (customPrompt2) body.customPrompt2 = customPrompt2;
+					if (targetLanguage) body.targetLanguage = targetLanguage;
+					if (generalWebhooks) body.generalWebhooks = generalWebhooks;
+					if (enrichmentWebhookUrl) body.enrichmentWebhookUrl = enrichmentWebhookUrl;
+					
+					if (existingProject) {
+						// Update existing project
+						const projectId = existingProject.id as string;
+						const updateOptions: IHttpRequestOptions = {
+							method: 'PATCH',
+							url: `${baseUrl}/projects/${projectId}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						};
+						responseData = await this.helpers.httpRequest(updateOptions);
+					} else {
+						// Create new project
+						const createOptions: IHttpRequestOptions = {
+							method: 'POST',
+							url: `${baseUrl}/projects`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body,
+						};
+						responseData = await this.helpers.httpRequest(createOptions);
+					}
+				} else if (resource === 'project' && operation === 'enrichCompany') {
+					const credentials = await this.getCredentials('enlystApi');
+					const baseUrl = credentials.baseUrl as string;
+					const projectName = this.getNodeParameter('projectName', i) as string;
+					const company = this.getNodeParameter('company', i, '') as string;
+					const website = this.getNodeParameter('website', i, '') as string;
+					const projectDescription = this.getNodeParameter('projectDescription', i, '') as string;
+					const pitchlaneIntegration = this.getNodeParameter('pitchlaneIntegrationEnrich', i, false) as boolean;
+					const customPrompt1 = this.getNodeParameter('customPrompt1Enrich', i, '') as string;
+					const customPrompt2 = this.getNodeParameter('customPrompt2Enrich', i, '') as string;
+					const targetLanguage = this.getNodeParameter('targetLanguageEnrich', i, 'de') as string;
+					const enrichmentWebhookUrl = this.getNodeParameter('enrichmentWebhookUrlEnrich', i) as string;
+					
+					// Validate: at least company or website is required
+					if (!company && !website) {
+						throw new ApplicationError('Either company or website must be provided');
+					}
+					
+					// Step 1: Create or update project (same logic as createOrUpdate)
+					const getOptions: IHttpRequestOptions = {
+						method: 'GET',
+						url: `${baseUrl}/projects`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+					};
+					const allProjects = await this.helpers.httpRequest(getOptions) as IDataObject;
+					const projects = allProjects.projects as IDataObject[];
+					
+					const existingProject = projects?.find((p: IDataObject) => 
+						(p.name as string).toLowerCase() === projectName.toLowerCase()
+					);
+					
+					const projectBody: IDataObject = { name: projectName };
+					if (projectDescription) projectBody.description = projectDescription;
+					if (pitchlaneIntegration) projectBody.pitchlaneIntegration = pitchlaneIntegration;
+					if (customPrompt1) projectBody.customPrompt1 = customPrompt1;
+					if (customPrompt2) projectBody.customPrompt2 = customPrompt2;
+					if (targetLanguage) projectBody.targetLanguage = targetLanguage;
+					projectBody.generalWebhooks = true; // Always enable webhooks
+					if (enrichmentWebhookUrl) projectBody.enrichmentWebhookUrl = enrichmentWebhookUrl;
+					
+					let projectId: string;
+					if (existingProject) {
+						projectId = existingProject.id as string;
+						const updateOptions: IHttpRequestOptions = {
+							method: 'PATCH',
+							url: `${baseUrl}/projects/${projectId}`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: projectBody,
+						};
+						await this.helpers.httpRequest(updateOptions);
+					} else {
+						const createOptions: IHttpRequestOptions = {
+							method: 'POST',
+							url: `${baseUrl}/projects`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: projectBody,
+						};
+						const createResponse = await this.helpers.httpRequest(createOptions) as IDataObject;
+						projectId = createResponse.id as string;
+					}
+					
+					// Step 2: Add company row to project
+					const addRowOptions: IHttpRequestOptions = {
+						method: 'POST',
+						url: `${baseUrl}/projects/${projectId}/add-rows`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: {
+							rows: [{
+								company: company || '',
+								website: website || '',
+							}]
+						},
+					};
+					const addRowResponse = await this.helpers.httpRequest(addRowOptions) as IDataObject;
+					
+					// Step 3: Start enrichment for all eligible rows
+					const enrichOptions: IHttpRequestOptions = {
+						method: 'POST',
+						url: `${baseUrl}/projects/${projectId}/enrich`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: {}, // Empty body = enrich all eligible rows
+					};
+					const enrichResponse = await this.helpers.httpRequest(enrichOptions) as IDataObject;
+					
+					// Return project info and enrichment status
+					responseData = {
+						projectId,
+						projectName,
+						rowsAdded: addRowResponse.insertedCount || 1,
+						enrichmentStarted: true,
+						enrichmentInfo: enrichResponse,
+						message: 'Company added and enrichment started. Results will be sent to webhook when complete.',
+					};
 				} else if (resource === 'project' && operation === 'update') {
 					const credentials = await this.getCredentials('enlystApi');
 					const baseUrl = credentials.baseUrl as string;

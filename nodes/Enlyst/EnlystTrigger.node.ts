@@ -1,201 +1,219 @@
 import {
-	INodeType,
-	INodeTypeDescription,
-	IWebhookResponseData,
-	IWebhookFunctions,
-} from 'n8n-workflow';
+	type IHookFunctions,
+	type IWebhookFunctions,
+	type INodeType,
+	type INodeTypeDescription,
+	type IWebhookResponseData,
+	type IHttpRequestOptions,
+	type IDataObject,
+} from 'n8n-workflow';export class EnlystTrigger implements INodeType {
+description: INodeTypeDescription = {
+displayName: 'Enlyst Trigger',
+name: 'enlystTrigger',
+icon: { light: 'file:enlyst.svg', dark: 'file:enlyst.dark.svg' },
+group: ['trigger'],
+version: 1,
+description: 'Starts enrichment and receives webhook when complete',
+defaults: {
+name: 'Enlyst Trigger',
+},
+inputs: [],
+outputs: ['main'],
+credentials: [{ name: 'enlystApi', required: true }],
+webhooks: [
+{
+name: 'default',
+httpMethod: 'POST',
+responseMode: 'onReceived',
+path: 'webhook',
+},
+],
+properties: [
+{
+displayName: 'Project Name',
+name: 'projectName',
+type: 'string',
+default: '',
+required: true,
+description: 'Name of the project (will be created or updated)',
+},
+{
+displayName: 'Company',
+name: 'company',
+type: 'string',
+default: '',
+required: true,
+description: 'Company name to enrich',
+},
+{
+displayName: 'Website',
+name: 'website',
+type: 'string',
+default: '',
+description: 'Company website to enrich (optional but recommended)',
+},
+{
+displayName: 'Target Language',
+name: 'targetLanguage',
+type: 'options',
+options: [
+{ name: 'Deutsch', value: 'de' },
+{ name: 'English', value: 'en' },
+{ name: 'Français', value: 'fr' },
+{ name: 'Español', value: 'es' },
+{ name: 'Italiano', value: 'it' },
+{ name: 'Nederlands', value: 'nl' },
+{ name: 'Português', value: 'pt' },
+{ name: 'Polski', value: 'pl' },
+],
+default: 'de',
+description: 'Target language for enrichment',
+},
+{
+displayName: 'Custom Prompt 1',
+name: 'customPrompt1',
+type: 'string',
+default: '',
+description: 'First custom prompt for AI enrichment',
+},
+{
+displayName: 'Custom Prompt 2',
+name: 'customPrompt2',
+type: 'string',
+default: '',
+description: 'Second custom prompt for AI enrichment',
+},
+{
+displayName: 'Pitchlane Integration',
+name: 'pitchlaneIntegration',
+type: 'boolean',
+default: false,
+description: 'Whether to enable Pitchlane integration',
+},
+],
+};
 
-export class EnlystTrigger implements INodeType {
-	description: INodeTypeDescription = {
-		displayName: 'Enlyst Trigger',
-		name: 'enlystTrigger',
-		icon: {
-			light: 'file:enlyst.svg',
-			dark: 'file:enlyst.dark.svg',
-		},
-		group: ['trigger'],
-		version: 1,
-		subtitle: 'Enrichment Completion',
-		description: 'Starts the workflow when an Enlyst enrichment process is completed',
-		defaults: {
-			name: 'Enlyst Trigger',
-		},
-		inputs: [],
-		outputs: ['main'],
-		usableAsTool: true,
-		credentials: [
-			{
-				name: 'enlystApi',
-				required: false,
-				displayOptions: {
-					show: {
-						authentication: ['credentials'],
-					},
-				},
-			},
-		],
-		webhooks: [
-			{
-				name: 'default',
-				httpMethod: 'POST',
-				responseMode: 'onReceived',
-				path: 'enlyst',
-			},
-		],
-		properties: [
-			{
-				displayName: 'Authentication',
-				name: 'authentication',
-				type: 'options',
-				options: [
-					{
-						name: 'None',
-						value: 'none',
-					},
-					{
-						name: 'API Key',
-						value: 'credentials',
-					},
-				],
-				default: 'none',
-				description: 'Authentication method for webhook security',
-			},
-			{
-				displayName: 'Events',
-				name: 'events',
-				type: 'multiOptions',
-				options: [
-					{
-						name: 'Enrichment Completed',
-						value: 'enrichment.completed',
-						description: 'Triggered when a batch enrichment process is completed',
-					},
-				],
-				default: ['enrichment.completed'],
-				description: 'Events that will trigger this webhook',
-			},
-			{
-				displayName: 'Project Filter',
-				name: 'projectFilter',
-				type: 'string',
-				default: '',
-				placeholder: 'project_123',
-				description: 'Only trigger for specific project ID (leave empty for all projects)',
-			},
-		],
-	};
+webhookMethods = {
+default: {
+async checkExists(this: IHookFunctions): Promise<boolean> {
+return true;
+},
+async create(this: IHookFunctions): Promise<boolean> {
+const webhookUrl = this.getNodeWebhookUrl('default');
+const credentials = await this.getCredentials('enlystApi');
+const baseUrl = credentials.baseUrl as string;
 
-	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-		const authType = this.getNodeParameter('authentication') as string;
-		const events = this.getNodeParameter('events') as string[];
-		const projectFilter = this.getNodeParameter('projectFilter') as string;
-		
-		const body = this.getBodyData();
-		const headers = this.getHeaderData();
+const projectName = this.getNodeParameter('projectName') as string;
+const company = this.getNodeParameter('company') as string;
+const website = this.getNodeParameter('website', '') as string;
+const targetLanguage = this.getNodeParameter('targetLanguage', 'de') as string;
+const customPrompt1 = this.getNodeParameter('customPrompt1', '') as string;
+const customPrompt2 = this.getNodeParameter('customPrompt2', '') as string;
+const pitchlaneIntegration = this.getNodeParameter('pitchlaneIntegration', false) as boolean;
 
-		// Validate authentication if enabled
-		if (authType === 'credentials') {
-			const credentials = await this.getCredentials('enlystApi');
-			const expectedAuthHeader = `Bearer ${credentials.accessToken}`;
-			const receivedAuthHeader = headers.authorization;
+// Step 1: Get all projects to find or create
+const getProjectsOptions: IHttpRequestOptions = {
+method: 'GET',
+url: `${baseUrl}/projects`,
+headers: {
+'Authorization': `Bearer ${credentials.accessToken}`,
+'Accept': 'application/json',
+'Content-Type': 'application/json',
+},
+};
+const allProjects = await this.helpers.httpRequest(getProjectsOptions) as IDataObject;
+const projects = allProjects.projects as IDataObject[];
 
-			if (receivedAuthHeader !== expectedAuthHeader) {
-				return {
-					webhookResponse: {
-						status: 401,
-						body: { error: 'Unauthorized' },
-					},
-				};
-			}
-		}
+const existingProject = projects?.find((p: IDataObject) => 
+(p.name as string).toLowerCase() === projectName.toLowerCase()
+);
 
-		// Validate webhook payload structure
-		if (!body || typeof body !== 'object') {
-			return {
-				webhookResponse: {
-					status: 400,
-					body: { error: 'Invalid payload' },
-				},
-			};
-		}
+// Step 2: Create or update project with webhook URL
+const projectBody: IDataObject = {
+name: projectName,
+targetLanguage,
+generalWebhooks: true,
+enrichmentWebhookUrl: webhookUrl,
+};
+if (customPrompt1) projectBody.customPrompt1 = customPrompt1;
+if (customPrompt2) projectBody.customPrompt2 = customPrompt2;
+if (pitchlaneIntegration) projectBody.pitchlaneIntegration = pitchlaneIntegration;
 
-		// Type the webhook data appropriately
-		interface EnlystWebhookData {
-			event: string;
-			timestamp: string;
-			data: {
-				projectId: string;
-				projectName: string;
-				stats: {
-					total: number;
-					completed: number;
-					failed: number;
-					stopped: number;
-					queued: number;
-					processing: number;
-				};
-				completedAt: string;
-			};
-		}
+let projectId: string;
+if (existingProject) {
+projectId = existingProject.id as string;
+const updateOptions: IHttpRequestOptions = {
+method: 'PATCH',
+url: `${baseUrl}/projects/${projectId}`,
+headers: {
+'Authorization': `Bearer ${credentials.accessToken}`,
+'Accept': 'application/json',
+'Content-Type': 'application/json',
+},
+body: projectBody,
+};
+await this.helpers.httpRequest(updateOptions);
+} else {
+const createOptions: IHttpRequestOptions = {
+method: 'POST',
+url: `${baseUrl}/projects`,
+headers: {
+'Authorization': `Bearer ${credentials.accessToken}`,
+'Accept': 'application/json',
+'Content-Type': 'application/json',
+},
+body: projectBody,
+};
+const createResponse = await this.helpers.httpRequest(createOptions) as IDataObject;
+projectId = createResponse.id as string;
+}
 
-		const webhookData = body as unknown as EnlystWebhookData;
+// Step 3: Add company row
+const addRowOptions: IHttpRequestOptions = {
+method: 'POST',
+url: `${baseUrl}/projects/${projectId}/add-rows`,
+headers: {
+'Authorization': `Bearer ${credentials.accessToken}`,
+'Accept': 'application/json',
+'Content-Type': 'application/json',
+},
+body: {
+rows: [{
+company: company || '',
+website: website || '',
+}]
+},
+};
+await this.helpers.httpRequest(addRowOptions);
 
-		// Validate event type
-		if (!webhookData.event || !events.includes(webhookData.event)) {
-			return {
-				webhookResponse: {
-					status: 200,
-					body: { message: 'Event type not subscribed' },
-				},
-			};
-		}
+// Step 4: Start enrichment
+const enrichOptions: IHttpRequestOptions = {
+method: 'POST',
+url: `${baseUrl}/projects/${projectId}/enrich`,
+headers: {
+'Authorization': `Bearer ${credentials.accessToken}`,
+'Accept': 'application/json',
+'Content-Type': 'application/json',
+},
+body: {},
+};
+await this.helpers.httpRequest(enrichOptions);
 
-		// Validate project filter if specified
-		if (projectFilter && webhookData.data?.projectId !== projectFilter) {
-			return {
-				webhookResponse: {
-					status: 200,
-					body: { message: 'Project not matching filter' },
-				},
-			};
-		}
+return true;
+},
+async delete(this: IHookFunctions): Promise<boolean> {
+return true;
+},
+},
+};
 
-		// Validate enrichment.completed event structure
-		if (webhookData.event === 'enrichment.completed') {
-			if (!webhookData.data || !webhookData.data.projectId || !webhookData.data.stats) {
-				return {
-					webhookResponse: {
-						status: 400,
-						body: { error: 'Invalid enrichment completion payload' },
-					},
-				};
-			}
-		}
+async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+const bodyData = this.getBodyData();
 
-		// Return successful response and trigger workflow
-		const returnData = {
-			event: webhookData.event,
-			timestamp: webhookData.timestamp,
-			projectId: webhookData.data?.projectId,
-			projectName: webhookData.data?.projectName,
-			stats: webhookData.data?.stats,
-			completedAt: webhookData.data?.completedAt,
-			headers,
-			body: webhookData,
-		};
-
-		return {
-			webhookResponse: {
-				status: 200,
-				body: { message: 'Webhook received successfully' },
-			},
-			workflowData: [
-				[
-					{
-						json: returnData,
-					},
-				],
-			],
-		};
-	}
+return {
+workflowData: [
+this.helpers.returnJsonArray([bodyData]),
+],
+};
+}
 }
