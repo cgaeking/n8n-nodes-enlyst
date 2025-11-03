@@ -91,6 +91,7 @@ default: false,
 description: 'Whether to enable Pitchlane integration',
 },
 ],
+		usableAsTool: true,
 };
 
 webhookMethods = {

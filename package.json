@@ -27,7 +27,7 @@
     "lint:fix": "n8n-node lint --fix",
     "test": "npm run lint && npm run build",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run test",
+    "prepublishOnly": "npm run build",
     "release": "release-it",
     "release:patch": "release-it patch",
     "release:minor": "release-it minor",

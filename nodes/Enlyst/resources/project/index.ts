@@ -273,7 +273,7 @@ export const projectFields: INodeProperties[] = [
 		},
 		default: '',
 		placeholder: 'e.g., {{ $("Webhook").item.json.webhookUrl }}',
-		description: 'n8n webhook URL to trigger when enrichment completes. Add a Webhook node and reference its URL here using an expression.',
+		description: 'N8n webhook URL to trigger when enrichment completes. Add a Webhook node and reference its URL here using an expression.',
 	},
 
 	/* -------------------------------------------------------------------------- */

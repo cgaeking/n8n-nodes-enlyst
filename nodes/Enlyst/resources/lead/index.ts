@@ -86,7 +86,7 @@ export const leadDescription: INodeProperties[] = [
 		name: 'limit',
 		type: 'number',
 		typeOptions: {
-			minValue: 0,
+			minValue: 1,
 		},
 		displayOptions: {
 			show: {
@@ -94,8 +94,8 @@ export const leadDescription: INodeProperties[] = [
 				operation: ['getProjectData'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return (0 = get all leads)',
+		default: 50,
+		description: 'Max number of results to return',
 		routing: {
 			send: {
 				type: 'query',
