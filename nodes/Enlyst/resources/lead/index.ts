@@ -45,19 +45,15 @@ export const leadDescription: INodeProperties[] = [
 		displayName: 'Project ID',
 		name: 'projectId',
 		type: 'string',
-		required: true,
+		required: false,
 		displayOptions: {
 			show: {
 				resource: ['lead'],
 				operation: ['getProjectData', 'enrichLeads', 'uploadCsv', 'downloadCsv'],
 			},
-			hide: {
-				operation: ['enrichLeads'],
-				enrichmentType: ['single'],
-			},
 		},
 		default: '',
-		description: 'ID of the project to work with',
+		description: 'ID of the project (optional for Single Row enrichment - if omitted, enrichment is not saved)',
 	},
 
 	/* -------------------------------------------------------------------------- */

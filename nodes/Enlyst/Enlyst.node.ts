@@ -76,9 +76,9 @@ export class Enlyst implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				if (resource === 'lead') {
-					// Project ID is optional for single enrichment
+					// Project ID is optional for single enrichment (standalone mode)
 					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
-					const projectId = (enrichmentType === 'single') ? '' : this.getNodeParameter('projectId', i) as string;
+					const projectId = this.getNodeParameter('projectId', i, '') as string;
 					
 					if (operation === 'getProjectData') {
 						const page = this.getNodeParameter('page', i, null) as number | null;
@@ -127,15 +127,26 @@ export class Enlyst implements INodeType {
 
 						// Build request body based on enrichment type
 						if (enrichmentType === 'single') {
-							// Standalone enrichment - no project needed
+							// Single row enrichment by company name
 							requestBody.company = this.getNodeParameter('company', i);
 							const website = this.getNodeParameter('website', i, '') as string;
 							if (website) {
 								requestBody.website = website;
 							}
-							enrichUrl = `${enrichBaseUrl}/enrich`;
+							
+							// If Project ID is provided, create row in project and enrich
+							// If no Project ID, use standalone enrichment (no storage)
+							if (projectId) {
+								enrichUrl = `${enrichBaseUrl}/projects/${projectId}/enrich`;
+							} else {
+								enrichUrl = `${enrichBaseUrl}/enrich`;
+							}
 						} else {
-							// Project-based enrichment
+							// All other enrichment types require a project
+							if (!projectId) {
+								throw new ApplicationError('Project ID is required for this enrichment type');
+							}
+							
 							if (enrichmentType === 'filtered') {
 								requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
 								requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
@@ -144,6 +155,8 @@ export class Enlyst implements INodeType {
 							} else if (enrichmentType === 'dryRun') {
 								requestBody.dryRun = true;
 							}
+							// 'all' enrichment type needs no additional parameters
+							
 							enrichUrl = `${enrichBaseUrl}/projects/${projectId}/enrich`;
 						}
 
