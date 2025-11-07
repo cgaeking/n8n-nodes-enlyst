@@ -58,8 +58,5 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
-  },
-  "dependencies": {
-    "n8n-nodes-enlyst": "file:"
   }
 }
