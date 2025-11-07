@@ -6,6 +6,8 @@ import {
 	type INodeTypeDescription,
 	type IHttpRequestOptions,
 	type IDataObject,
+	type IWebhookFunctions,
+	type IWebhookResponseData,
 	ApplicationError,
 } from 'n8n-workflow';
 import { projectDescription } from './resources/project';
@@ -28,6 +30,14 @@ export class Enlyst implements INodeType {
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'enlystApi', required: true }],
+		webhooks: [
+			{
+				name: 'default',
+				httpMethod: 'POST',
+				responseMode: 'onReceived',
+				path: 'webhook',
+			},
+		],
 		requestDefaults: {
 			baseURL: '={{$credentials.baseUrl}}',
 			headers: {
@@ -122,6 +132,7 @@ export class Enlyst implements INodeType {
 						const requestBody: IDataObject = {};
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
+						const waitForCompletion = this.getNodeParameter('waitForCompletion', i, false) as boolean;
 
 						// Build request body based on enrichment type
 						if (enrichmentType === 'filtered') {
@@ -134,7 +145,7 @@ export class Enlyst implements INodeType {
 						}
 						// 'all' enrichment type needs no additional parameters
 
-						const options: IHttpRequestOptions = {
+						const enrichOptions: IHttpRequestOptions = {
 							method: 'POST',
 							url: `${baseUrl}/projects/${projectId}/enrich`,
 							headers: {
@@ -145,7 +156,58 @@ export class Enlyst implements INodeType {
 							body: requestBody,
 						};
 
-						responseData = await this.helpers.httpRequest(options);					} else if (operation === 'uploadCsv') {
+						responseData = await this.helpers.httpRequest(enrichOptions);
+						
+						// If waiting for completion, poll for status until done
+						if (waitForCompletion) {
+							const maxWaitTime = 3600000; // 1 hour max
+							const pollInterval = 10000; // Check every 10 seconds
+							const startTime = Date.now();
+							
+							let isComplete = false;
+							while (!isComplete && (Date.now() - startTime) < maxWaitTime) {
+								// Wait before polling
+								await new Promise(resolve => setTimeout(resolve, pollInterval));
+								
+								// Get project data to check status
+								const dataOptions: IHttpRequestOptions = {
+									method: 'GET',
+									url: `${baseUrl}/projects/${projectId}/data?page=1&limit=1`,
+									headers: {
+										'Authorization': `Bearer ${credentials.accessToken}`,
+										'Accept': 'application/json',
+										'Content-Type': 'application/json',
+									},
+								};
+								
+								const dataResponse = await this.helpers.httpRequest(dataOptions) as IDataObject;
+								const data = dataResponse.data as IDataObject[];
+								
+								// Check if there are any processing/pending items
+								const hasProcessing = data?.some((item: IDataObject) => 
+									item.status === 'processing' || item.status === 'pending'
+								);
+								
+								if (!hasProcessing) {
+									isComplete = true;
+									// Return all completed data
+									const allDataOptions: IHttpRequestOptions = {
+										method: 'GET',
+										url: `${baseUrl}/projects/${projectId}/data?page=0`,
+										headers: {
+											'Authorization': `Bearer ${credentials.accessToken}`,
+											'Accept': 'application/json',
+											'Content-Type': 'application/json',
+										},
+									};
+									responseData = await this.helpers.httpRequest(allDataOptions);
+								}
+							}
+							
+							if (!isComplete) {
+								throw new ApplicationError('Enrichment timeout: Process did not complete within 1 hour');
+							}
+						}					} else if (operation === 'uploadCsv') {
 						// For CSV upload, we need to handle file upload differently
 						const companyColumn = this.getNodeParameter('companyColumn', i) as string;
 						const websiteColumn = this.getNodeParameter('websiteColumn', i) as string;
@@ -232,23 +294,37 @@ export class Enlyst implements INodeType {
 								'Content-Type': 'application/json',
 							},
 						};
-						responseData = await this.helpers.httpRequest(options);
-					} else if (resource === 'project' && operation === 'create') {
+						const response = await this.helpers.httpRequest(options) as IDataObject;
+						// API returns { project: {...} }, extract the project
+						responseData = (response.project as IDataObject) || response;
+					} else if (resource === 'project' && operation === 'getByName') {
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
-						const name = this.getNodeParameter('name', i) as string;
+						const projectName = this.getNodeParameter('projectName', i) as string;
 						
+						// Get all projects and find by name (case-insensitive)
 						const options: IHttpRequestOptions = {
-							method: 'POST',
+							method: 'GET',
 							url: `${baseUrl}/projects`,
 							headers: {
 								'Authorization': `Bearer ${credentials.accessToken}`,
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: { name },
 						};
-						responseData = await this.helpers.httpRequest(options);
+						const response = await this.helpers.httpRequest(options) as IDataObject;
+						const projects = response.projects as IDataObject[];
+						
+						// Find first project matching name (case-insensitive)
+						const project = projects?.find((p: IDataObject) => 
+							(p.name as string).toLowerCase() === projectName.toLowerCase()
+						);
+						
+						if (!project) {
+							throw new ApplicationError(`Project with name "${projectName}" not found`);
+						}
+						
+						responseData = project;
 				} else if (resource === 'project' && operation === 'createOrUpdate') {
 					const credentials = await this.getCredentials('enlystApi');
 					const baseUrl = credentials.baseUrl as string;
@@ -416,5 +492,17 @@ export class Enlyst implements INodeType {
 		}
 
 		return this.prepareOutputData(returnData);
+	}
+
+	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+		const req = this.getRequestObject();
+		const bodyData = req.body as IDataObject;
+
+		// Return the webhook data
+		return {
+			workflowData: [
+				this.helpers.returnJsonArray(bodyData),
+			],
+		};
 	}
 }

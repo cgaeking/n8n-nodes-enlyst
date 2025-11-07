@@ -153,6 +153,19 @@ export const leadDescription: INodeProperties[] = [
 	/*                              lead:enrichLeads                             */
 	/* -------------------------------------------------------------------------- */
 	{
+		displayName: 'Wait for Completion',
+		name: 'waitForCompletion',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['enrichLeads'],
+			},
+		},
+		default: false,
+		description: 'Whether to wait for enrichment to complete before continuing workflow. When enabled, the node will register a webhook and wait for the enrichment-finished callback.',
+	},
+	{
 		displayName: 'Enrichment Type',
 		name: 'enrichmentType',
 		type: 'options',

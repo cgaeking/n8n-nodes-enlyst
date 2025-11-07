@@ -35,12 +35,12 @@ export const projectOperations: INodeProperties[] = [
 				value: 'getById',
 				description: 'Retrieve a project by ID',
 				action: 'Get a project by ID',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/projects/{{$parameter.projectId}}',
-					},
-				},
+			},
+			{
+				name: 'Get by Name',
+				value: 'getByName',
+				description: 'Retrieve a project by name (first match if multiple exist)',
+				action: 'Get a project by name',
 			},
 			{
 				name: 'Get Many',
@@ -76,6 +76,24 @@ export const projectFields: INodeProperties[] = [
 		default: '',
 		required: true,
 		description: 'ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              project:getByName                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project Name',
+		name: 'projectName',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['getByName'],
+			},
+		},
+		default: '',
+		required: true,
+		description: 'Name of the project to find',
 	},
 
 	/* -------------------------------------------------------------------------- */
