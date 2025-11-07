@@ -202,20 +202,38 @@ export const leadDescription: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Stopped',
+				value: 'stopped',
+				description: 'Rows that are stopped (default)',
+			},
+			{
 				name: 'Pending',
 				value: 'pending',
+				description: 'Rows waiting to be processed',
 			},
 			{
 				name: 'Failed',
 				value: 'failed',
+				description: 'Rows that failed enrichment',
 			},
 			{
-				name: 'Stopped',
-				value: 'stopped',
+				name: 'Empty/Null Status',
+				value: '',
+				description: 'Rows with no status set (empty or null)',
+			},
+			{
+				name: 'Processing',
+				value: 'processing',
+				description: 'Rows currently being processed',
+			},
+			{
+				name: 'Completed',
+				value: 'completed',
+				description: 'Successfully enriched rows',
 			},
 		],
-		default: ['pending'],
-		description: 'Which statuses to include in enrichment',
+		default: ['stopped'],
+		description: 'Which statuses to include in enrichment (default: stopped only)',
 		routing: {
 			send: {
 				type: 'body',
