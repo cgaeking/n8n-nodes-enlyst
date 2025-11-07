@@ -242,33 +242,6 @@ export const projectFields: INodeProperties[] = [
 		default: 'de',
 		description: 'Target language for enrichment',
 	},
-	{
-		displayName: 'General Webhooks',
-		name: 'generalWebhooks',
-		type: 'boolean',
-		displayOptions: {
-			show: {
-				resource: ['project'],
-				operation: ['createOrUpdate'],
-			},
-		},
-		default: false,
-		description: 'Whether to enable general webhooks',
-	},
-	{
-		displayName: 'Enrichment Webhook URL',
-		name: 'enrichmentWebhookUrl',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['project'],
-				operation: ['createOrUpdate'],
-			},
-		},
-		default: '',
-		placeholder: 'e.g., {{ $("Webhook").item.json.webhookUrl }}',
-		description: 'N8n webhook URL to trigger when enrichment completes. Add a Webhook node and reference its URL here using an expression.',
-	},
 
 	/* -------------------------------------------------------------------------- */
 	/*                                project:update                             */

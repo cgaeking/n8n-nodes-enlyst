@@ -258,12 +258,8 @@ export class Enlyst implements INodeType {
 					const customPrompt1 = this.getNodeParameter('customPrompt1', i, '') as string;
 					const customPrompt2 = this.getNodeParameter('customPrompt2', i, '') as string;
 					const targetLanguage = this.getNodeParameter('targetLanguage', i, 'de') as string;
-					const enrichmentWebhookUrl = this.getNodeParameter('enrichmentWebhookUrl', i, '') as string;
 					
-					// Always enable general webhooks
-					const generalWebhooks = true;
-					
-					// First, get all projects to search by name
+					// STEP 1: Get all projects to search by name
 					const getOptions: IHttpRequestOptions = {
 						method: 'GET',
 						url: `${baseUrl}/projects`,
@@ -281,19 +277,22 @@ export class Enlyst implements INodeType {
 						(p.name as string).toLowerCase() === name.toLowerCase()
 					);
 					
-					// Build body with all optional fields
-					const body: IDataObject = { name };
+					// Build body WITHOUT webhook URL first
+					const body: IDataObject = { 
+						name,
+						generalWebhooks: true, // Always enable webhooks
+					};
 					if (description) body.description = description;
 					if (pitchlaneIntegration) body.pitchlaneIntegration = pitchlaneIntegration;
 					if (customPrompt1) body.customPrompt1 = customPrompt1;
 					if (customPrompt2) body.customPrompt2 = customPrompt2;
 					if (targetLanguage) body.targetLanguage = targetLanguage;
-					if (generalWebhooks) body.generalWebhooks = generalWebhooks;
-					if (enrichmentWebhookUrl) body.enrichmentWebhookUrl = enrichmentWebhookUrl;
+					
+					let projectId: string;
 					
 					if (existingProject) {
 						// Update existing project
-						const projectId = existingProject.id as string;
+						projectId = existingProject.id as string;
 						const updateOptions: IHttpRequestOptions = {
 							method: 'PATCH',
 							url: `${baseUrl}/projects/${projectId}`,
@@ -317,8 +316,33 @@ export class Enlyst implements INodeType {
 							},
 							body,
 						};
-						responseData = await this.helpers.httpRequest(createOptions);
+						const createResponse = await this.helpers.httpRequest(createOptions) as IDataObject;
+						// API returns { project: {...} } so we need to extract it
+						const projectObj = createResponse.project as IDataObject;
+						projectId = projectObj.id as string;
 					}
+					
+					// STEP 2: Now we have projectId - calculate webhook URL and update project
+					// Webhook URL format: {baseUrl}/webhooks/n8n/{projectId}
+					const enrichmentWebhookUrl = `${baseUrl}/webhooks/n8n/${projectId}`;
+					
+					// Update project with webhook URL (must include 'name' as it's required by API)
+					const webhookUpdateOptions: IHttpRequestOptions = {
+						method: 'PATCH',
+						url: `${baseUrl}/projects/${projectId}`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: {
+							name, // Required by API
+							generalWebhooks: true, // Ensure webhooks are enabled
+							enrichmentWebhookUrl,
+						},
+					};
+					responseData = await this.helpers.httpRequest(webhookUpdateOptions);
+					
 				} else if (resource === 'project' && operation === 'update') {
 					const credentials = await this.getCredentials('enlystApi');
 					const baseUrl = credentials.baseUrl as string;
