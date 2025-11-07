@@ -129,12 +129,13 @@ export class Enlyst implements INodeType {
 						responseData = await this.helpers.httpRequest(options);
 						
 					} else if (operation === 'enrichLeads') {
-						const requestBody: IDataObject = {};
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
 						const waitForCompletion = this.getNodeParameter('waitForCompletion', i, false) as boolean;
 
 						// Build request body based on enrichment type
+						const requestBody: IDataObject = {};
+						
 						if (enrichmentType === 'filtered') {
 							requestBody.includeStatuses = this.getNodeParameter('includeStatuses', i);
 							requestBody.excludeErrors = this.getNodeParameter('excludeErrors', i);
@@ -142,8 +143,13 @@ export class Enlyst implements INodeType {
 							requestBody.maxRows = this.getNodeParameter('maxRows', i);
 						} else if (enrichmentType === 'dryRun') {
 							requestBody.dryRun = true;
+						} else if (enrichmentType === 'all') {
+							// Explicitly set default values for 'all' enrichment
+							requestBody.includeStatuses = ['stopped', 'failed', null, '', 'pending'];
+							requestBody.excludeErrors = true;
+							requestBody.startRow = 0;
+							requestBody.maxRows = null;
 						}
-						// 'all' enrichment type needs no additional parameters
 
 						const enrichOptions: IHttpRequestOptions = {
 							method: 'POST',
@@ -169,10 +175,10 @@ export class Enlyst implements INodeType {
 								// Wait before polling
 								await new Promise(resolve => setTimeout(resolve, pollInterval));
 								
-								// Get project data to check status
-								const dataOptions: IHttpRequestOptions = {
+								// Check project stats to see if enrichment is done
+								const statsOptions: IHttpRequestOptions = {
 									method: 'GET',
-									url: `${baseUrl}/projects/${projectId}/data?page=1&limit=1`,
+									url: `${baseUrl}/projects/${projectId}/enrich`,
 									headers: {
 										'Authorization': `Bearer ${credentials.accessToken}`,
 										'Accept': 'application/json',
@@ -180,20 +186,16 @@ export class Enlyst implements INodeType {
 									},
 								};
 								
-								const dataResponse = await this.helpers.httpRequest(dataOptions) as IDataObject;
-								const data = dataResponse.data as IDataObject[];
+								const statsResponse = await this.helpers.httpRequest(statsOptions) as IDataObject;
+								const activeCount = statsResponse.active as number;
 								
-								// Check if there are any processing/pending items
-								const hasProcessing = data?.some((item: IDataObject) => 
-									item.status === 'processing' || item.status === 'pending'
-								);
-								
-								if (!hasProcessing) {
+								// Check if there are any active (processing/queued) items
+								if (activeCount === 0) {
 									isComplete = true;
-									// Return all completed data
+									// Return all completed data (no page/limit = return all)
 									const allDataOptions: IHttpRequestOptions = {
 										method: 'GET',
-										url: `${baseUrl}/projects/${projectId}/data?page=0`,
+										url: `${baseUrl}/projects/${projectId}/data`,
 										headers: {
 											'Authorization': `Bearer ${credentials.accessToken}`,
 											'Accept': 'application/json',
