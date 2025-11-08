@@ -24,17 +24,21 @@ export const leadDescription: INodeProperties[] = [
 				description: 'Enrich leads (single or bulk enrichment)',
 				action: 'Enrich leads',
 			},
-			{
-				name: 'Find Leads',
-				value: 'findLeads',
-				description: 'Find leads via Google Maps search',
-				action: 'Find leads',
-			},
-		],
-		default: 'getProjectData',
-	},
-
-	// Project ID (required for all lead operations)
+		{
+			name: 'Find Leads',
+			value: 'findLeads',
+			description: 'Find leads via Google Maps search',
+			action: 'Find leads',
+		},
+		{
+			name: 'Add Leads',
+			value: 'addLeads',
+			description: 'Add leads from other sources to a project',
+			action: 'Add leads',
+		},
+	],
+	default: 'getProjectData',
+},	// Project ID (required for all lead operations)
 	{
 		displayName: 'Project ID',
 		name: 'projectId',
@@ -43,7 +47,7 @@ export const leadDescription: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['lead'],
-				operation: ['getProjectData', 'enrichLeads'],
+				operation: ['getProjectData', 'enrichLeads', 'addLeads'],
 			},
 		},
 		default: '',
@@ -462,5 +466,39 @@ export const leadDescription: INodeProperties[] = [
 		},
 		default: '',
 		description: 'ID of the project to add leads to',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              lead:addLeads                                */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Company Name',
+		name: 'company',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['addLeads'],
+			},
+		},
+		required: true,
+		default: '',
+		placeholder: 'e.g., {{$json.company}}',
+		description: 'Company name from previous node',
+	},
+	{
+		displayName: 'Website',
+		name: 'website',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['addLeads'],
+			},
+		},
+		required: false,
+		default: '',
+		placeholder: 'e.g., {{$json.website}}',
+		description: 'Company website URL (optional)',
 	},
 ];

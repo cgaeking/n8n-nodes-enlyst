@@ -88,7 +88,7 @@ export class Enlyst implements INodeType {
 				if (resource === 'lead') {
 					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
 					// Get projectId only for operations that require it (not for findLeads when addToProject is false)
-					const projectId = (operation === 'getProjectData' || operation === 'enrichLeads') 
+					const projectId = (operation === 'getProjectData' || operation === 'enrichLeads' || operation === 'addLeads') 
 						? this.getNodeParameter('projectId', i) as string 
 						: '';
 					
@@ -328,6 +328,48 @@ export class Enlyst implements INodeType {
 								leads,
 							};
 						}
+					} else if (operation === 'addLeads') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+						
+						const company = this.getNodeParameter('company', i) as string;
+						const website = this.getNodeParameter('website', i, '') as string;
+						
+						// Validate input
+						if (!company || company.trim() === '') {
+							throw new ApplicationError('Company name is required');
+						}
+						
+						// Add the lead to the project
+						const addOptions: IHttpRequestOptions = {
+							method: 'POST',
+							url: `${baseUrl}/leads/add`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								projectId,
+								leads: [{
+									company: company.trim(),
+									website: website.trim(),
+								}],
+							},
+						};
+
+						const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;
+						
+						responseData = {
+							success: true,
+							message: addResponse.message || 'Lead added successfully',
+							projectId,
+							company: company.trim(),
+							website: website.trim(),
+							addedCount: addResponse.addedCount || 0,
+							skippedCount: addResponse.skippedCount || 0,
+							duplicatesFound: addResponse.duplicatesFound || 0,
+						};
 					}
 				}
 
