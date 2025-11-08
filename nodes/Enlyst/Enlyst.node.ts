@@ -294,19 +294,18 @@ export class Enlyst implements INodeType {
 									'Authorization': `Bearer ${credentials.accessToken}`,
 									'Accept': 'application/json',
 									'Content-Type': 'application/json',
-								},
-								body: {
-									projectId,
-									leads: leads.map((lead: IDataObject) => ({
-										company: lead.name,
-										website: lead.website || '',
-									})),
-								},
-							};
+							},
+						body: {
+							projectId,
+							leads: leads.map((lead: IDataObject) => ({
+								company: lead.name,
+								website: lead.website || '',
+								externalData: lead.externalData,
+							})),
+						},
+						};
 
-							const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;
-							
-							responseData = {
+						const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;							responseData = {
 								success: true,
 								searchQuery: searchTerm,
 								location: locationName,
