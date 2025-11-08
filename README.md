@@ -369,7 +369,47 @@ Getestet mit n8n Version 1.0+ und Node.js 18+
 
 ## Version history
 
-### v0.5.0 (Latest)
+### v0.5.4 (Latest)
+
+> 8 November 2025
+
+**Documentation:**
+
+- Improved: Complete node documentation with detailed descriptions for all operations
+- Improved: Renamed "Prepare project with webhook" to "Prepare project" for clarity
+- Added: Comprehensive usage examples and parameter explanations
+- Added: Clear prerequisites and workflow guidance
+
+### v0.5.3
+
+> 8 November 2025
+
+**Bug Fixes:**
+
+- Fixed: Added documentationUrl property to fix 404 errors when clicking docs link in n8n UI
+- Fixed: Links now properly direct to GitHub README instead of placeholder URL
+
+### v0.5.2
+
+> 8 November 2025
+
+**New Features:**
+
+- Added: Prepare Project operation - Setup webhook for existing project without modifying other settings
+- Enhanced: API now supports partial updates (optional name parameter)
+
+### v0.5.1
+
+> 8 November 2025
+
+**Bug Fixes:**
+
+- Fixed: setTimeout restriction - replaced with compliant async pattern
+- Fixed: Status options now alphabetically sorted
+- Fixed: Language options now alphabetically sorted
+- Fixed: Removed superfluous required: false properties
+
+### v0.5.0
 
 > 8 November 2025
 
