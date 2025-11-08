@@ -1,41 +1,43 @@
 # 🚀 n8n-nodes-enlyst
 
-**Offizielle n8n-Integration für Enlyst** - die KI-basierte Lead-Anreicherungsplattform.
+**[🇬🇧 English](README.md)** | **[🇩🇪 Deutsch](README.de.md)**
+
+**Official n8n integration for Enlyst** - the AI-powered lead enrichment platform.
 
 [![npm version](https://badge.fury.io/js/n8n-nodes-enlyst.svg)](https://badge.fury.io/js/n8n-nodes-enlyst)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Enlyst](https://enlyst.app) ist eine KI-basierte Lead-Anreicherungsplattform, die aus einfachen Unternehmenslisten vollständige Lead-Profile mit Geschäftsführer-Daten, E-Mail-Adressen und personalisierten Ansprachen erstellt.
+[Enlyst](https://enlyst.app) is an AI-powered lead enrichment platform that transforms simple company lists into complete lead profiles with executive data, email addresses, and personalized messages.
 
-[n8n](https://n8n.io/) ist eine [fair-code lizenzierte](https://docs.n8n.io/sustainable-use-license/) Workflow-Automatisierungsplattform.
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
-## 📦 Enthaltene Nodes
+## 📦 Included Nodes
 
-### **1. Enlyst Node** - API-Operationen
+### **1. Enlyst Node** - API Operations
 
-- **Projekte verwalten** (Erstellen, Abrufen, Aktualisieren, Löschen)
-- **Lead-Daten abrufen** mit Pagination und Multi-Status-Filterung
-- **Leads finden** via Google Maps Suche mit Geocoding
-- **Leads hinzufügen** aus externen Quellen mit Custom Data
-- **Massen-Enrichment** starten (alle, gefiltert, einzelne Rows)
-- **CSV-Upload** für neue Lead-Listen
-- **CSV-Download** mit Status-Filterung
+- **Manage projects** (Create, Retrieve, Update, Delete)
+- **Retrieve lead data** with pagination and multi-status filtering
+- **Find leads** via Google Maps search with geocoding
+- **Add leads** from external sources with custom data
+- **Start bulk enrichment** (all, filtered, single rows)
+- **CSV upload** for new lead lists
+- **CSV download** with status filtering
 
 ### **2. Enlyst Trigger** - Webhook Automation
 
-- **Enrichment Completion** - Wird ausgelöst wenn Massen-Enrichment fertig ist
-- **API-Key Authentication** für sicheren Webhook-Empfang
-- **Projekt-Filter** für spezifische Projekte
-- **Enrichment-Statistiken** als Workflow-Daten
+- **Enrichment Completion** - Triggered when bulk enrichment is complete
+- **API-Key Authentication** for secure webhook reception
+- **Project Filter** for specific projects
+- **Enrichment Statistics** as workflow data
 
 ## Installation
 
-### Option 1: Community Nodes (Empfohlen)
+### Option 1: Community Nodes (Recommended)
 
-1. Gehen Sie zu **Settings > Community Nodes** in n8n
-2. Klicken Sie auf **Install a community node**
-3. Geben Sie ein: `n8n-nodes-enlyst`
-4. Klicken Sie auf **Install**
+1. Go to **Settings > Community Nodes** in n8n
+2. Click **Install a community node**
+3. Enter: `n8n-nodes-enlyst`
+4. Click **Install**
 
 ### Option 2: NPM Installation
 
@@ -49,27 +51,113 @@ npm install n8n-nodes-enlyst
 
 #### **Create or Update Project**
 
-Erstellt ein neues Projekt oder aktualisiert ein bestehendes Projekt anhand des Namens.
+Creates a new project or updates an existing project by name.
 
-**Wichtig:** Diese Funktion enthält auch die Webhook-Setup-Funktionalität von "Prepare Project". Sie können beim Erstellen oder Aktualisieren direkt Webhooks konfigurieren.
+**Important:** This function also includes the webhook setup functionality of "Prepare Project". You can configure webhooks directly when creating or updating.
 
-**Verwendung:**
+**Usage:**
 
-- Neues Projekt mit Name, Beschreibung und Sprache anlegen
-- Bestehendes Projekt finden (anhand Name) und aktualisieren
-- Pitchlane-Integration aktivieren/deaktivieren
-- Custom Prompts für KI-Enrichment definieren
-- Zielsprache für Anreicherung festlegen (Deutsch, English, Español, Français, Italiano, Nederlands, Polski, Português)
+- Create new project with name, description and language
+- Find existing project (by name) and update it
+- Enable/disable Pitchlane integration
+- Define custom prompts for AI enrichment
+- Set target language for enrichment (Deutsch, English, Español, Français, Italiano, Nederlands, Polski, Português)
 
-**Eingaben:**
+**Inputs:**
 
-- `name` (erforderlich): Projektname
-- `description`: Projektbeschreibung
-- `pitchlaneIntegration`: Pitchlane-Video-Integration aktivieren
-- `customPrompt1/2`: Benutzerdefinierte KI-Prompts
-- `targetLanguage`: Zielsprache für Enrichment (Standard: Deutsch)
+- `name` (required): Project name
+- `description`: Project description
+- `pitchlaneIntegration`: Enable Pitchlane video integration
+- `customPrompt1/2`: Custom AI prompts
+- `targetLanguage`: Target language for enrichment (default: German)
 
 ---
+
+#### **Delete Project**
+
+Permanently deletes an existing project.
+
+**Usage:**
+
+- Remove project permanently
+- All associated leads will also be deleted
+
+**Inputs:**
+
+- `projectId` (required): ID of the project to delete
+
+---
+
+#### **Get Project by ID**
+
+Retrieves a specific project by its ID.
+
+**Usage:**
+
+- Retrieve project details
+- Check project configuration
+- Get base URL for other operations
+
+**Inputs:**
+
+- `projectId` (required): Project ID
+
+**Output:** Complete project information including name, description, settings, creation date
+
+---
+
+#### **Get Project by Name**
+
+Retrieves a project by name (first match if multiple projects exist).
+
+**Usage:**
+
+- Determine project ID by name
+- Useful when only the name is known
+
+**Inputs:**
+
+- `projectName` (required): Project name
+
+**Output:** Project details of the first found project with this name
+
+---
+
+#### **Get Many Projects**
+
+Lists all available projects.
+
+**Usage:**
+
+- Get overview of all projects
+- Collect project IDs for further operations
+- Project selection in workflows
+
+**Output:** Array of all projects with complete details
+
+---
+
+#### **Prepare Project**
+
+Sets up webhooks for an existing project. This is a **prerequisite** for using "Wait for Completion" with "Enrich Leads".
+
+**Usage:**
+
+- Set webhook URL for enrichment notifications
+- Enable automatic notification when batch enrichment is complete
+- Required for asynchronous workflows with enrichment trigger
+
+**Inputs:**
+
+- `projectId` (required): ID of the project to prepare
+
+**Automatic Actions:**
+
+- Enables "General Webhooks" for the project
+- Sets `enrichmentWebhookUrl` to the n8n webhook URL: `{baseUrl}/webhooks/n8n/{projectId}`
+- Enables use of the **Enlyst Trigger** for this project
+
+**Note:** This is a simplified alternative to manual webhook configuration via "Create or Update Project".
 
 #### **Delete Project**
 
@@ -163,209 +251,207 @@ Richtet Webhooks für ein bestehendes Projekt ein. Dies ist **Voraussetzung** f�
 
 #### **Get Leads**
 
-Ruft Lead-Daten eines Projekts mit Pagination und erweiterten Filtermöglichkeiten ab.
+Retrieves lead data from a project with pagination and advanced filtering options.
 
-**Verwendung:**
+**Usage:**
 
-- Lead-Daten aus einem Projekt abrufen
-- Nur Leads mit bestimmten Status exportieren
-- Große Datenmengen mit Pagination verarbeiten
+- Retrieve lead data from a project
+- Export only leads with specific statuses
+- Process large amounts of data with pagination
 
-**Eingaben:**
+**Inputs:**
 
-- `projectId` (erforderlich): ID des Projekts
-- `page`: Seitennummer (0 = alle Leads)
-- `limit`: Max. Anzahl Ergebnisse pro Seite (Standard: 50)
-- `status`: Multi-Select-Filter nach Status (Completed, Empty/Null Status, Failed, Pending, Processing, Stopped)
+- `projectId` (required): Project ID
+- `page`: Page number (0 = all leads)
+- `limit`: Max number of results per page (default: 50)
+- `status`: Multi-select filter by status (Completed, Empty/Null Status, Failed, Pending, Processing, Stopped)
 
-**Ausgabe:** Array mit Lead-Objekten inkl. aller Enrichment-Daten (Name, E-Mail, Ansprache, Custom Data, Google Maps Daten etc.)
+**Output:** Array of lead objects including all enrichment data (name, email, message, custom data, Google Maps data, etc.)
 
 ---
 
 #### **Enrich Leads**
 
-Startet die KI-basierte Anreicherung von Leads (einzeln oder als Batch).
+Starts AI-powered enrichment of leads (single or batch).
 
-**Verwendung:**
+**Usage:**
 
-- Einzelne Leads anreichern
-- Alle Leads eines Projekts anreichern
-- Gefilterte Leads anreichern (nach Status)
-- Spezifische Zeilen anreichern
+- Enrich single leads
+- Enrich all leads in a project
+- Enrich filtered leads (by status)
+- Enrich specific rows
 
-**Eingaben:**
+**Inputs:**
 
-- `projectId` (erforderlich): ID des Projekts
+- `projectId` (required): Project ID
 - `enrichmentType`:
-  - `all`: Alle Leads anreichern
-  - `filtered`: Nur Leads mit bestimmten Status
-  - `singleRow`: Einzelne Zeile (Row ID)
-- `status` (bei filtered): Multi-Select-Filter nach Status
-- `rowId` (bei singleRow): ID der anzureichernden Zeile
-- `waitForCompletion`: Auf Abschluss warten (nur bei Batch-Enrichment)
-  - **Voraussetzung:** Projekt muss mit "Prepare Project" vorbereitet sein!
+  - `all`: Enrich all leads
+  - `filtered`: Only leads with specific statuses
+  - `singleRow`: Single row (Row ID)
+- `status` (for filtered): Multi-select filter by status
+- `rowId` (for singleRow): ID of the row to enrich
+- `waitForCompletion`: Wait for completion (batch enrichment only)
+  - **Prerequisite:** Project must be prepared with "Prepare Project"!
 
-**Enrichment-Prozess:**
+**Enrichment Process:**
 
-1. Lead wird von KI analysiert
-2. Geschäftsführer-Informationen werden gesucht
-3. E-Mail-Adresse wird ermittelt (via AnyMailFinder)
-4. Personalisierte Ansprache wird generiert
-5. Status wird auf "Completed" gesetzt
+1. Lead is analyzed by AI
+2. Executive information is searched
+3. Email address is determined (via AnyMailFinder)
+4. Personalized message is generated
+5. Status is set to "Completed"
 
-**Hinweis:** Bei `waitForCompletion: true` wartet der Node bis alle Leads fertig sind. Der **Enlyst Trigger** kann alternativ verwendet werden für asynchrone Workflows.
+**Note:** With `waitForCompletion: true`, the node waits until all leads are finished. The **Enlyst Trigger** can alternatively be used for asynchronous workflows.
 
 ---
 
 #### **Find Leads**
 
-Sucht Leads via Google Maps und fügt sie optional direkt einem Projekt hinzu.
+Searches for leads via Google Maps and optionally adds them directly to a project.
 
-**Verwendung:**
+**Usage:**
 
-- Leads in bestimmter Region finden
-- Google Maps Suche mit Keyword und Ort
-- Externe Daten (Adresse, Telefon, Bewertungen) automatisch übernehmen
-- Optional: Direkt in Projekt importieren
+- Find leads in a specific region
+- Google Maps search with keyword and location
+- Automatically adopt external data (address, phone, ratings)
+- Optional: Import directly into project
 
-**Eingaben:**
+**Inputs:**
 
-- `searchKeyword`: Suchbegriff (z.B. "Restaurant", "Zahnarzt", "Handwerksbetrieb")
-- `location`: Standort (Stadtname, Adresse oder GPS-Koordinaten)
-- `language`: Sprache für Suchergebnisse (Standard: Deutsch)
-- `projectId` (optional): Projekt-ID für direkten Import
-- `country`: Land-Code für Geocoding (Standard: Deutschland)
+- `searchKeyword`: Search term (e.g., "Restaurant", "Dentist", "Craftsman")
+- `location`: Location (city name, address or GPS coordinates)
+- `language`: Language for search results (default: German)
+- `projectId` (optional): Project ID for direct import
+- `country`: Country code for geocoding (default: Germany)
 
-**Ausgabe:** Array mit gefundenen Leads inkl. vollständiger Google Maps Daten:
+**Output:** Array of found leads including complete Google Maps data:
 
-- `googleMaps_place_id`: Eindeutige Place ID
-- `googleMaps_name`: Unternehmensname
-- `googleMaps_address`: Vollständige Adresse
-- `googleMaps_phone`: Telefonnummer
-- `googleMaps_website`: Website-URL
-- `googleMaps_rating`: Bewertung (1-5 Sterne)
-- `googleMaps_reviews`: Anzahl Bewertungen
-- `googleMaps_types`: Kategorien (z.B. "restaurant", "cafe")
-- `googleMaps_lat/lng`: GPS-Koordinaten
+- `googleMaps_place_id`: Unique Place ID
+- `googleMaps_name`: Company name
+- `googleMaps_address`: Full address
+- `googleMaps_phone`: Phone number
+- `googleMaps_website`: Website URL
+- `googleMaps_rating`: Rating (1-5 stars)
+- `googleMaps_reviews`: Number of reviews
+- `googleMaps_types`: Categories (e.g., "restaurant", "cafe")
+- `googleMaps_lat/lng`: GPS coordinates
 
 ---
 
 #### **Add Leads**
 
-Importiert Leads aus externen Quellen in ein Projekt.
+Imports leads from external sources into a project.
 
-**Verwendung:**
+**Usage:**
 
-- Leads von anderen APIs übernehmen
-- Bestehende Lead-Daten importieren
-- Custom Data von externen Systemen mitbringen
-- Integration mit CRM-Systemen
+- Adopt leads from other APIs
+- Import existing lead data
+- Bring custom data from external systems
+- Integration with CRM systems
 
-**Eingaben:**
+**Inputs:**
 
-- `projectId` (erforderlich): Ziel-Projekt ID
-- `leads`: Array von Lead-Objekten
+- `projectId` (required): Target project ID
+- `leads`: Array of lead objects
 
-**Lead-Objekt-Struktur:**
+**Lead Object Structure:**
 
 ```javascript
 {
-  companyName: "Musterfirma GmbH",  // erforderlich
-  website: "https://example.com",    // optional
-  externalData: {                    // optional - beliebige Felder
+  companyName: "Example Company Inc.",  // required
+  website: "https://example.com",        // optional
+  externalData: {                        // optional - any fields
     source: "CRM-System",
-    contactPerson: "Max Mustermann",
-    customField1: "Wert"
+    contactPerson: "John Doe",
+    customField1: "Value"
   }
 }
 ```
 
-**Ausgabe:** Bestätigung mit Anzahl importierter Leads
+**Output:** Confirmation with number of imported leads
 
-**Hinweis:** Alle Felder in `externalData` werden als `googleMaps_*` Felder gespeichert und in CSV-Exporten inkludiert.
-
----
+**Note:** All fields in `externalData` are stored as `googleMaps_*` fields and included in CSV exports.
 
 ### 🔔 Triggers
 
 #### **On Enrichment Finished**
 
-Webhook-Trigger der ausgelöst wird sobald ein Batch-Enrichment abgeschlossen ist.
+Webhook trigger that is fired when a batch enrichment is complete.
 
-**Verwendung:**
+**Usage:**
 
-- Automatische Benachrichtigungen nach Enrichment
-- Weiterverarbeitung der angereicherten Daten
-- Integration mit CRM, E-Mail, Slack etc.
-- Asynchrone Workflows ohne Warten
+- Automatic notifications after enrichment
+- Further processing of enriched data
+- Integration with CRM, email, Slack, etc.
+- Asynchronous workflows without waiting
 
-**Voraussetzungen:**
+**Prerequisites:**
 
-1. Projekt muss mit **"Prepare Project"** vorbereitet sein
-2. Webhook-URL aus n8n Trigger in Enlyst-Projekt hinterlegt
+1. Project must be prepared with **"Prepare Project"**
+2. Webhook URL from n8n trigger stored in Enlyst project
 
 **Setup:**
 
-1. Füge "Enlyst Trigger" zu deinem Workflow hinzu
-2. Kopiere die Webhook-URL
-3. In Enlyst: Projekt > Einstellungen > Allgemeine Webhooks
-4. Aktiviere "Batch-Enrichment beendet" und trage URL ein
+1. Add "Enlyst Trigger" to your workflow
+2. Copy the webhook URL
+3. In Enlyst: Project > Settings > General Webhooks
+4. Enable "Batch enrichment completed" and enter URL
 
-**Trigger-Daten:**
+**Trigger Data:**
 
-- `projectId`: ID des Projekts
-- `projectName`: Name des Projekts
-- `totalLeads`: Gesamtanzahl Leads
-- `enrichedLeads`: Erfolgreich angereicherte Leads
-- `completedAt`: Zeitstempel des Abschlusses
+- `projectId`: Project ID
+- `projectName`: Project name
+- `totalLeads`: Total number of leads
+- `enrichedLeads`: Successfully enriched leads
+- `completedAt`: Completion timestamp
 
-**Beispiel-Workflows:**
+**Example Workflows:**
 
-- **CRM-Sync:** Trigger → Download CSV → HTTP Request (CRM API)
-- **Slack-Notification:** Trigger → Format Message → Slack
-- **E-Mail-Report:** Trigger → Get Leads → Format HTML → Send Email
+- **CRM Sync:** Trigger → Download CSV → HTTP Request (CRM API)
+- **Slack Notification:** Trigger → Format Message → Slack
+- **Email Report:** Trigger → Get Leads → Format HTML → Send Email
 
 ## Credentials
 
-Sie benötigen Enlyst API-Credentials:
+You need Enlyst API credentials:
 
-1. **Base URL**: Ihre Enlyst-Instanz URL (Standard: `https://enlyst.app/api`)
-2. **API Key**: Ihr Enlyst API-Schlüssel
+1. **Base URL**: Your Enlyst instance URL (default: `https://enlyst.app/api`)
+2. **API Key**: Your Enlyst API key
 
-### API-Schlüssel erhalten:
+### Get API Key
 
-1. Melden Sie sich bei [Enlyst](https://enlyst.app) an
-2. Gehen Sie zu **Einstellungen > API-Schlüssel**
-3. Erstellen Sie einen neuen API-Schlüssel
-4. Kopieren Sie den Schlüssel (wird nur einmal angezeigt!)
+1. Sign in to [Enlyst](https://enlyst.app)
+2. Go to **Settings > API Keys**
+3. Create a new API key
+4. Copy the key (shown only once!)
 
 ## Compatibility
 
-Getestet mit n8n Version 1.0+ und Node.js 18+
+Tested with n8n version 1.0+ and Node.js 18+
 
 ## Usage
 
-### Webhook-Setup (Enlyst Trigger)
+### Webhook Setup (Enlyst Trigger)
 
-1. Fügen Sie **Enlyst Trigger** zu Ihrem Workflow hinzu
-2. Kopieren Sie die Webhook-URL aus n8n
-3. Gehen Sie zu Ihrem Enlyst-Projekt > **Einstellungen** > **Allgemeine Webhooks**
-4. Aktivieren Sie **"Batch-Enrichment beendet"** und tragen Sie die Webhook-URL ein
+1. Add **Enlyst Trigger** to your workflow
+2. Copy the webhook URL from n8n
+3. Go to your Enlyst project > **Settings** > **General Webhooks**
+4. Enable **"Batch enrichment completed"** and enter the webhook URL
 
-### Beispiel-Workflows
+### Example Workflows
 
-- **Lead-Suche & CRM-Integration**: Create or Update Project → Find Leads → Enrich Leads → Add Leads to CRM
-- **Projekt vorbereiten & Enrichment**: Get Project by Name → Prepare Project → Add Leads → Enrich Leads
+- **Lead Search & CRM Integration**: Create or Update Project → Find Leads → Enrich Leads → Add Leads to CRM
+- **Prepare Project & Enrichment**: Get Project by Name → Prepare Project → Add Leads → Enrich Leads
 - **Google Sheets Integration**: Create or Update Project → Add Leads → Enrich Leads → Add Leads to Google Sheet
-- **Slack-Benachrichtigung**: On Enrichment Completed → Slack Message
+- **Slack Notification**: On Enrichment Completed → Slack Message
 
 ## Resources
 
-- [n8n Community Nodes Dokumentation](https://docs.n8n.io/integrations/#community-nodes)
+- [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/#community-nodes)
 - [Enlyst Website](https://enlyst.app)
 - [GitHub Repository](https://github.com/cgaeking/n8n-nodes-enlyst)
 
-## Version history
+## Version History
 
 ### v0.5.6 (Latest)
 
