@@ -367,7 +367,17 @@ Tested with n8n version 1.0+ and Node.js 18+
 
 ## Version History
 
-### v0.6.0 (Latest)
+### v0.6.1 (Latest)
+
+> 8 November 2025
+
+**Documentation:**
+
+- Fixed: Removed all remaining German text from English README
+- Fixed: Removed duplicate node descriptions
+- Improved: Clean, fully translated English documentation
+
+### v0.6.0
 
 > 8 November 2025
 
