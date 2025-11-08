@@ -363,9 +363,8 @@ Getestet mit n8n Version 1.0+ und Node.js 18+
 ## Resources
 
 - [n8n Community Nodes Dokumentation](https://docs.n8n.io/integrations/#community-nodes)
-- [Enlyst API Dokumentation](https://enlyst.app/api-docs)
-- [Enlyst User Docs](https://docs.enlyst.app)
-- [GitHub Repository](https://github.com/cgaeking/enlyst)
+- [Enlyst Website](https://enlyst.app)
+- [GitHub Repository](https://github.com/cgaeking/n8n-nodes-enlyst)
 
 ## Version history
 
