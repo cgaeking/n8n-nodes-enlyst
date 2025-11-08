@@ -298,9 +298,8 @@ export class Enlyst implements INodeType {
 								body: {
 									projectId,
 									leads: leads.map((lead: IDataObject) => ({
-										name: lead.name,
+										company: lead.name,
 										website: lead.website || '',
-										address: lead.address || '',
 									})),
 								},
 							};
