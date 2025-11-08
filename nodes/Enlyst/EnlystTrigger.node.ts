@@ -16,6 +16,7 @@ import {
 		defaults: {
 			name: 'Enlyst Trigger',
 		},
+		documentationUrl: 'https://github.com/cgaeking/n8n-nodes-enlyst#readme',
 		inputs: [],
 		outputs: ['main'],
 		credentials: [{ name: 'enlystApi', required: true }],

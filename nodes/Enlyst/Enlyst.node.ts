@@ -25,6 +25,7 @@ export class Enlyst implements INodeType {
 		defaults: {
 			name: 'Enlyst',
 		},
+		documentationUrl: 'https://github.com/cgaeking/n8n-nodes-enlyst#readme',
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
