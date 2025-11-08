@@ -12,7 +12,6 @@ import {
 } from 'n8n-workflow';
 import { projectDescription } from './resources/project';
 import { leadDescription } from './resources/lead';
-import { referralDescription } from './resources/referral';
 
 export class Enlyst implements INodeType {
 	description: INodeTypeDescription = {
@@ -62,17 +61,11 @@ export class Enlyst implements INodeType {
 						value: 'lead',
 						description: 'Search and manage leads',
 					},
-					{
-						name: 'Referral',
-						value: 'referral',
-						description: 'Manage referral system',
-					},
 				],
 				default: 'project',
 			},
 			...projectDescription,
 			...leadDescription,
-			...referralDescription,
 		],
 	};
 
