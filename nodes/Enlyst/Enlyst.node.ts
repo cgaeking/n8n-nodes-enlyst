@@ -210,65 +210,7 @@ export class Enlyst implements INodeType {
 							if (!isComplete) {
 								throw new ApplicationError('Enrichment timeout: Process did not complete within 1 hour');
 							}
-						}					} else if (operation === 'uploadCsv') {
-						// For CSV upload, we need to handle file upload differently
-						const companyColumn = this.getNodeParameter('companyColumn', i) as string;
-						const websiteColumn = this.getNodeParameter('websiteColumn', i) as string;
-						const mode = this.getNodeParameter('mode', i) as string;
-						const delimiter = this.getNodeParameter('delimiter', i) as string;
-
-						// This is a placeholder - in real implementation, you'd handle the file upload
-						const options: IHttpRequestOptions = {
-							method: 'POST',
-							url: '/projects/upload-csv',
-							headers: {
-								'Content-Type': 'multipart/form-data',
-							},
-							body: {
-								projectId,
-								companyColumn,
-								websiteColumn,
-								mode,
-								delimiter,
-								// file: csvFile // This would need proper file handling
-							},
-						};
-
-						responseData = await this.helpers.httpRequestWithAuthentication.call(this, 'enlystApi', options);
-
-					} else if (operation === 'downloadCsv') {
-						const statusFilter = this.getNodeParameter('downloadStatusFilter', i) as string[];
-						const hasEmailFilter = this.getNodeParameter('hasEmailFilter', i) as boolean;
-
-						const credentials = await this.getCredentials('enlystApi');
-						const baseUrl = credentials.baseUrl as string;
-
-						const requestBody = {
-							filters: {
-								status: statusFilter,
-								hasEmail: hasEmailFilter,
-							},
-						};
-
-						const enrichOptions: IHttpRequestOptions = {
-							method: 'POST',
-							url: `${baseUrl}/projects/${projectId}/enrich`,
-							headers: {
-								'Authorization': `Bearer ${credentials.accessToken}`,
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-						};
-
-						console.log('[ENLYST] Enrich Request:', JSON.stringify({
-							url: enrichOptions.url,
-							body: requestBody
-						}, null, 2));
-
-						responseData = await this.helpers.httpRequest(enrichOptions);
-						
-						console.log('[ENLYST] Enrich Response:', JSON.stringify(responseData, null, 2));
+						}
 					}
 				}
 

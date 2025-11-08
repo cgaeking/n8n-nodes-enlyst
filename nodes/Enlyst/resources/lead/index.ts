@@ -24,18 +24,6 @@ export const leadDescription: INodeProperties[] = [
 				description: 'Enrich leads (single or bulk enrichment)',
 				action: 'Enrich leads',
 			},
-			{
-				name: 'Upload CSV',
-				value: 'uploadCsv',
-				description: 'Upload CSV file to project',
-				action: 'Upload CSV file',
-			},
-			{
-				name: 'Download CSV',
-				value: 'downloadCsv',
-				description: 'Download project data as CSV',
-				action: 'Download CSV file',
-			},
 		],
 		default: 'getProjectData',
 	},
@@ -49,7 +37,7 @@ export const leadDescription: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['lead'],
-				operation: ['getProjectData', 'enrichLeads', 'uploadCsv', 'downloadCsv'],
+				operation: ['getProjectData', 'enrichLeads'],
 			},
 		},
 		default: '',
@@ -332,177 +320,6 @@ export const leadDescription: INodeProperties[] = [
 			send: {
 				type: 'body',
 				property: 'dryRun',
-			},
-		},
-	},
-
-	/* -------------------------------------------------------------------------- */
-	/*                              lead:uploadCsv                               */
-	/* -------------------------------------------------------------------------- */
-	{
-		displayName: 'CSV File',
-		name: 'csvFile',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['uploadCsv'],
-			},
-		},
-		required: true,
-		default: '',
-		placeholder: 'binary:data',
-		description: 'The CSV file to upload (from binary data)',
-		routing: {
-			request: {
-				method: 'POST',
-				url: '/projects/upload-csv',
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			},
-		},
-	},
-	{
-		displayName: 'Company Column',
-		name: 'companyColumn',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['uploadCsv'],
-			},
-		},
-		required: true,
-		default: 'Firmenname',
-		description: 'Name of the column containing company names',
-	},
-	{
-		displayName: 'Website Column',
-		name: 'websiteColumn',
-		type: 'string',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['uploadCsv'],
-			},
-		},
-		default: 'Website',
-		description: 'Name of the column containing website URLs',
-	},
-	{
-		displayName: 'Import Mode',
-		name: 'mode',
-		type: 'options',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['uploadCsv'],
-			},
-		},
-		options: [
-			{
-				name: 'Append',
-				value: 'append',
-				description: 'Add rows to existing data',
-			},
-			{
-				name: 'Replace',
-				value: 'replace',
-				description: 'Replace all existing data',
-			},
-		],
-		default: 'append',
-		description: 'How to handle existing project data',
-	},
-	{
-		displayName: 'Delimiter',
-		name: 'delimiter',
-		type: 'options',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['uploadCsv'],
-			},
-		},
-		options: [
-			{
-				name: 'Comma (,)',
-				value: ',',
-			},
-			{
-				name: 'Semicolon (;)',
-				value: ';',
-			},
-		],
-		default: ',',
-		description: 'CSV delimiter character',
-	},
-
-	/* -------------------------------------------------------------------------- */
-	/*                             lead:downloadCsv                              */
-	/* -------------------------------------------------------------------------- */
-	{
-		displayName: 'Filter by Status',
-		name: 'downloadStatusFilter',
-		type: 'multiOptions',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['downloadCsv'],
-			},
-		},
-		options: [
-			{
-				name: 'Completed',
-				value: 'completed',
-			},
-			{
-				name: 'Failed',
-				value: 'failed',
-			},
-			{
-				name: 'Pending',
-				value: 'pending',
-			},
-			{
-				name: 'Processing',
-				value: 'processing',
-			},
-			{
-				name: 'Stopped',
-				value: 'stopped',
-			},
-		],
-		default: ['completed'],
-		description: 'Which statuses to include in the export',
-		routing: {
-			request: {
-				method: 'POST',
-				url: '=/projects/{{$parameter.projectId}}/download-csv',
-			},
-			send: {
-				type: 'body',
-				property: 'filters.status',
-			},
-		},
-	},
-	{
-		displayName: 'Has Email Filter',
-		name: 'hasEmailFilter',
-		type: 'boolean',
-		displayOptions: {
-			show: {
-				resource: ['lead'],
-				operation: ['downloadCsv'],
-			},
-		},
-		default: false,
-		description: 'Whether to include only rows that have an email address',
-		routing: {
-			send: {
-				type: 'body',
-				property: 'filters.hasEmail',
 			},
 		},
 	},
