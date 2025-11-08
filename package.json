@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-enlyst",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "n8n node for Enlyst lead enrichment and data management platform with webhook trigger",
   "license": "MIT",
   "homepage": "https://enlyst.app",
