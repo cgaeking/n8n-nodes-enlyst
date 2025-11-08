@@ -526,6 +526,36 @@ export class Enlyst implements INodeType {
 					};
 					responseData = await this.helpers.httpRequest(webhookUpdateOptions);
 					
+				} else if (resource === 'project' && operation === 'prepareProject') {
+					// Only setup webhook for existing project (no other changes)
+					const credentials = await this.getCredentials('enlystApi');
+					const baseUrl = credentials.baseUrl as string;
+					const projectId = this.getNodeParameter('projectId', i) as string;
+					
+					// Calculate webhook URL
+					const enrichmentWebhookUrl = `${baseUrl}/webhooks/n8n/${projectId}`;
+					
+					// Update project with webhook URL only (name is now optional in API)
+					const webhookUpdateOptions: IHttpRequestOptions = {
+						method: 'PATCH',
+						url: `${baseUrl}/projects/${projectId}`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: {
+							generalWebhooks: true,
+							enrichmentWebhookUrl,
+						},
+					};
+					
+					try {
+						responseData = await this.helpers.httpRequest(webhookUpdateOptions);
+					} catch (error) {
+						throw new ApplicationError(`Failed to prepare project: ${error.message}. Project ID: ${projectId}, Webhook URL: ${enrichmentWebhookUrl}`);
+					}
+					
 				} else if (resource === 'project' && operation === 'update') {
 					const credentials = await this.getCredentials('enlystApi');
 					const baseUrl = credentials.baseUrl as string;

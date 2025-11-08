@@ -54,6 +54,12 @@ export const projectOperations: INodeProperties[] = [
 					},
 				},
 			},
+			{
+				name: 'Prepare Project',
+				value: 'prepareProject',
+				description: 'Setup webhook for an existing project',
+				action: 'Prepare project with webhook',
+			},
 		],
 		default: 'createOrUpdate',
 	},
@@ -70,7 +76,7 @@ export const projectFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['project'],
-				operation: ['getById', 'delete'],
+				operation: ['getById', 'delete', 'prepareProject'],
 			},
 		},
 		default: '',
