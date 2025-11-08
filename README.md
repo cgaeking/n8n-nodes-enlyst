@@ -354,11 +354,10 @@ Getestet mit n8n Version 1.0+ und Node.js 18+
 
 ### Beispiel-Workflows
 
-- **Lead-Suche & Enrichment**: Find Leads (Google Maps) → Add to Project → Enrich → Notification
-- **Automatisches Lead-Enrichment**: Upload CSV → Enrich → Download → Notification
-- **CRM-Integration**: Webhook Trigger → Download CSV → HTTP Request (CRM API)
-- **Slack-Benachrichtigung**: Webhook Trigger → Slack Message
-- **Multi-Source Lead Import**: HTTP Request → Add Leads (mit Custom Data) → Enrich
+- **Lead-Suche & CRM-Integration**: Create or Update Project → Find Leads → Enrich Leads → Add Leads to CRM
+- **Projekt vorbereiten & Enrichment**: Get Project by Name → Prepare Project → Add Leads → Enrich Leads
+- **Google Sheets Integration**: Create or Update Project → Add Leads → Enrich Leads → Add Leads to Google Sheet
+- **Slack-Benachrichtigung**: On Enrichment Completed → Slack Message
 
 ## Resources
 
