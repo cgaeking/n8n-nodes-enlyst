@@ -29,12 +29,7 @@
 - Find Leads (Google Maps search with geocoding)
 - Add Leads (import from external sources)
 
-### **2. Enlyst Trigger** - Webhook Automation
 
-- **On Enrichment Finished** - Triggered when batch enrichment is complete
-- API-Key Authentication for secure webhook reception
-- Project Filter for specific projects
-- Enrichment Statistics as workflow data
 
 ## Installation
 
@@ -161,7 +156,6 @@ Sets up webhooks for an existing project. This is a **prerequisite** for using "
 
 - Enables "General Webhooks" for the project
 - Sets `enrichmentWebhookUrl` to the n8n webhook URL: `{baseUrl}/webhooks/n8n/{projectId}`
-- Enables use of the **Enlyst Trigger** for this project
 
 **Note:** This is a simplified alternative to manual webhook configuration via "Create or Update Project".
 
@@ -221,7 +215,7 @@ Starts AI-powered enrichment of leads (single or batch).
 4. Personalized message is generated
 5. Status is set to "Completed"
 
-**Note:** With `waitForCompletion: true`, the node waits until all leads are finished. The **Enlyst Trigger** can alternatively be used for asynchronous workflows.
+**Note:** With `waitForCompletion: true`, the node waits until all leads are finished.
 
 ---
 
@@ -292,44 +286,7 @@ Imports leads from external sources into a project.
 
 **Note:** All fields in `externalData` are stored as `googleMaps_*` fields and included in CSV exports.
 
-### 🔔 Triggers
-
-#### **On Enrichment Finished**
-
-Webhook trigger that is fired when a batch enrichment is complete.
-
-**Usage:**
-
-- Automatic notifications after enrichment
-- Further processing of enriched data
-- Integration with CRM, email, Slack, etc.
-- Asynchronous workflows without waiting
-
-**Prerequisites:**
-
-1. Project must be prepared with **"Prepare Project"**
-2. Webhook URL from n8n trigger stored in Enlyst project
-
-**Setup:**
-
-1. Add "Enlyst Trigger" to your workflow
-2. Copy the webhook URL
-3. In Enlyst: Project > Settings > General Webhooks
-4. Enable "Batch enrichment completed" and enter URL
-
-**Trigger Data:**
-
-- `projectId`: Project ID
-- `projectName`: Project name
-- `totalLeads`: Total number of leads
-- `enrichedLeads`: Successfully enriched leads
-- `completedAt`: Completion timestamp
-
-**Example Workflows:**
-
-- **CRM Sync:** Trigger → Download CSV → HTTP Request (CRM API)
-- **Slack Notification:** Trigger → Format Message → Slack
-- **Email Report:** Trigger → Get Leads → Format HTML → Send Email
+## Credentials
 
 ## Credentials
 
@@ -350,13 +307,6 @@ You need Enlyst API credentials:
 Tested with n8n version 1.0+ and Node.js 18+
 
 ## Usage
-
-### Webhook Setup (Enlyst Trigger)
-
-1. Add **Enlyst Trigger** to your workflow
-2. Copy the webhook URL from n8n
-3. Go to your Enlyst project > **Settings** > **General Webhooks**
-4. Enable **"Batch enrichment completed"** and enter the webhook URL
 
 ### Example Workflows
 
@@ -483,10 +433,9 @@ Tested with n8n version 1.0+ and Node.js 18+
 
 ### v0.2.0
 
-- Added: Enlyst Trigger Node for webhook automation
-- Added: Enrichment Completion event support
-- Added: API-Key authentication for webhooks
-- Added: Project filter for specific triggers
+- Added: Webhook automation capabilities
+- Added: API-Key authentication
+- Added: Project filter options
 
 ### v0.1.0
 

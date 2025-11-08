@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-enlyst",
   "version": "0.6.1",
-  "description": "n8n node for Enlyst lead enrichment and data management platform with webhook trigger",
+  "description": "n8n node for Enlyst lead enrichment and data management platform",
   "license": "MIT",
   "homepage": "https://enlyst.app",
   "keywords": [
@@ -45,8 +45,7 @@
       "dist/credentials/EnlystApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Enlyst/Enlyst.node.js",
-      "dist/nodes/Enlyst/EnlystTrigger.node.js"
+      "dist/nodes/Enlyst/Enlyst.node.js"
     ]
   },
   "devDependencies": {
