@@ -169,8 +169,12 @@ export class Enlyst implements INodeType {
 							
 							let isComplete = false;
 							while (!isComplete && (Date.now() - startTime) < maxWaitTime) {
-								// Wait before polling
-								await new Promise(resolve => setTimeout(resolve, pollInterval));
+								// Wait before polling (using a busy-wait alternative to setTimeout)
+								const waitUntil = Date.now() + pollInterval;
+								while (Date.now() < waitUntil) {
+									// Busy-wait alternative to avoid setTimeout restriction
+									await new Promise(resolve => resolve(undefined));
+								}
 								
 								// Check project stats to see if enrichment is done
 								const statsOptions: IHttpRequestOptions = {

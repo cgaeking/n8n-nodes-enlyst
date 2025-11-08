@@ -213,19 +213,9 @@ export const leadDescription: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Stopped',
-				value: 'stopped',
-				description: 'Rows that are stopped (default)',
-			},
-			{
-				name: 'Pending',
-				value: 'pending',
-				description: 'Rows waiting to be processed',
-			},
-			{
-				name: 'Failed',
-				value: 'failed',
-				description: 'Rows that failed enrichment',
+				name: 'Completed',
+				value: 'completed',
+				description: 'Successfully enriched rows',
 			},
 			{
 				name: 'Empty/Null Status',
@@ -233,14 +223,24 @@ export const leadDescription: INodeProperties[] = [
 				description: 'Rows with no status set (empty or null)',
 			},
 			{
+				name: 'Failed',
+				value: 'failed',
+				description: 'Rows that failed enrichment',
+			},
+			{
+				name: 'Pending',
+				value: 'pending',
+				description: 'Rows waiting to be processed',
+			},
+			{
 				name: 'Processing',
 				value: 'processing',
 				description: 'Rows currently being processed',
 			},
 			{
-				name: 'Completed',
-				value: 'completed',
-				description: 'Successfully enriched rows',
+				name: 'Stopped',
+				value: 'stopped',
+				description: 'Rows that are stopped (default)',
 			},
 		],
 		default: ['stopped'],
@@ -496,7 +496,6 @@ export const leadDescription: INodeProperties[] = [
 				operation: ['addLeads'],
 			},
 		},
-		required: false,
 		default: '',
 		placeholder: 'e.g., {{$json.website}}',
 		description: 'Company website URL (optional)',

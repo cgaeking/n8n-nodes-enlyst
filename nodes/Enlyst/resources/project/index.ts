@@ -185,12 +185,12 @@ export const projectFields: INodeProperties[] = [
 				value: 'en',
 			},
 			{
-				name: 'Français',
-				value: 'fr',
-			},
-			{
 				name: 'Español',
 				value: 'es',
+			},
+			{
+				name: 'Français',
+				value: 'fr',
 			},
 			{
 				name: 'Italiano',
@@ -201,12 +201,12 @@ export const projectFields: INodeProperties[] = [
 				value: 'nl',
 			},
 			{
-				name: 'Português',
-				value: 'pt',
-			},
-			{
 				name: 'Polski',
 				value: 'pl',
+			},
+			{
+				name: 'Português',
+				value: 'pt',
 			},
 		],
 		default: 'de',
