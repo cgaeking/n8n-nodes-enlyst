@@ -367,7 +367,23 @@ Getestet mit n8n Version 1.0+ und Node.js 18+
 
 ## Version history
 
-### v0.5.4 (Latest)
+### v0.5.6 (Latest)
+
+> 8 November 2025
+
+**Documentation:**
+
+- Fixed: Example workflows now match actual node operations with realistic use cases
+
+### v0.5.5
+
+> 8 November 2025
+
+**Documentation:**
+
+- Removed: Non-functional docs.enlyst.app link from Resources section
+
+### v0.5.4
 
 > 8 November 2025
 
