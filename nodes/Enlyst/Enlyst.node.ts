@@ -145,7 +145,8 @@ export class Enlyst implements INodeType {
 							requestBody.dryRun = true;
 						} else if (enrichmentType === 'all') {
 							// Explicitly set default values for 'all' enrichment
-							requestBody.includeStatuses = ['stopped', 'failed', null, '', 'pending'];
+							// Include null, empty string, and stopped (ready) - matching the GUI behavior
+							requestBody.includeStatuses = [null, '', 'stopped'];
 							requestBody.excludeErrors = true;
 							requestBody.startRow = 0;
 							requestBody.maxRows = null;
@@ -249,9 +250,9 @@ export class Enlyst implements INodeType {
 							},
 						};
 
-						const options: IHttpRequestOptions = {
+						const enrichOptions: IHttpRequestOptions = {
 							method: 'POST',
-							url: `${baseUrl}/projects/${projectId}/download-csv`,
+							url: `${baseUrl}/projects/${projectId}/enrich`,
 							headers: {
 								'Authorization': `Bearer ${credentials.accessToken}`,
 								'Accept': 'application/json',
@@ -260,7 +261,14 @@ export class Enlyst implements INodeType {
 							body: requestBody,
 						};
 
-						responseData = await this.helpers.httpRequest(options);
+						console.log('[ENLYST] Enrich Request:', JSON.stringify({
+							url: enrichOptions.url,
+							body: requestBody
+						}, null, 2));
+
+						responseData = await this.helpers.httpRequest(enrichOptions);
+						
+						console.log('[ENLYST] Enrich Response:', JSON.stringify(responseData, null, 2));
 					}
 				}
 
