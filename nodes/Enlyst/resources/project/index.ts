@@ -58,7 +58,7 @@ export const projectOperations: INodeProperties[] = [
 				name: 'Prepare Project',
 				value: 'prepareProject',
 				description: 'Setup webhook for an existing project',
-				action: 'Prepare project with webhook',
+				action: 'Prepare project',
 			},
 		],
 		default: 'createOrUpdate',
