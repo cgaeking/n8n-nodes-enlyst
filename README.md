@@ -12,19 +12,19 @@
 ## 📦 Enthaltene Nodes
 
 ### **1. Enlyst Node** - API-Operationen
-- ✅ **Projekte verwalten** (Erstellen, Abrufen, Aktualisieren, Löschen)
-- ✅ **Lead-Daten abrufen** mit Pagination und Multi-Status-Filterung
-- ✅ **Leads finden** via Google Maps Suche mit Geocoding
-- ✅ **Leads hinzufügen** aus externen Quellen mit Custom Data
-- ✅ **Massen-Enrichment** starten (alle, gefiltert, einzelne Rows)
-- ✅ **CSV-Upload** für neue Lead-Listen
-- ✅ **CSV-Download** mit Status-Filterung
+- **Projekte verwalten** (Erstellen, Abrufen, Aktualisieren, Löschen)
+- **Lead-Daten abrufen** mit Pagination und Multi-Status-Filterung
+- **Leads finden** via Google Maps Suche mit Geocoding
+- **Leads hinzufügen** aus externen Quellen mit Custom Data
+- **Massen-Enrichment** starten (alle, gefiltert, einzelne Rows)
+- **CSV-Upload** für neue Lead-Listen
+- **CSV-Download** mit Status-Filterung
 
 ### **2. Enlyst Trigger** - Webhook Automation
-- 🪝 **Enrichment Completion** - Wird ausgelöst wenn Massen-Enrichment fertig ist
-- 🔒 **API-Key Authentication** für sicheren Webhook-Empfang
-- 🎯 **Projekt-Filter** für spezifische Projekte
-- 📊 **Enrichment-Statistiken** als Workflow-Daten
+- **Enrichment Completion** - Wird ausgelöst wenn Massen-Enrichment fertig ist
+- **API-Key Authentication** für sicheren Webhook-Empfang
+- **Projekt-Filter** für spezifische Projekte
+- **Enrichment-Statistiken** als Workflow-Daten
 
 ## Installation
 
@@ -102,36 +102,42 @@ Getestet mit n8n Version 1.0+ und Node.js 18+
 ## Version history
 
 ### v0.5.0 (Latest)
+
+> 8 November 2025
+
 **Breaking Changes:**
-- 🚨 **Referral Operations entfernt** - Referral-System jetzt über Enlyst UI
+- Removed: Referral resource and Get Stats operation (referral statistics feature removed)
 
-**Neue Features:**
-- ✅ **Find Leads Operation** - Google Maps Suche für neue Leads
-  - Suche nach Standort (Name oder Koordinaten)
-  - Automatisches Geocoding via OpenStreetMap
-  - Optionale Projektzuweisung
-  - Externe Daten werden vollständig gespeichert
-- ✅ **Add Leads Operation** - Import von Leads aus externen Quellen
-- ✅ **Multi-Status Filter** - Mehrere Status gleichzeitig filtern
-- ✅ **Externe Daten Support** - Alle Daten von Google Maps werden als `googleMaps_*` gespeichert
+**New Features:**
+- Added: Find Leads operation - Search for leads via Google Maps
+  - Search by location name OR GPS coordinates
+  - Automatic geocoding via OpenStreetMap Nominatim API
+  - Optional project assignment (can be used standalone)
+  - All external data (address, phone, ratings, etc.) fully preserved
+- Added: Add Leads operation - Import leads from external sources
+- Added: Multi-Status Filter - Filter by multiple statuses simultaneously
+- Added: External Data Support - All Google Maps data stored as `googleMaps_*` fields
 
-**Verbesserungen:**
-- 📊 Externe Daten in expandierbaren Zeilen (Frontend)
-- 📁 CSV-Export enthält alle externen Felder
-- 🔄 Bessere Handhabung von verschachtelten Objekten (JSON-String Konvertierung)
+**Improvements:**
+- External data displayed in expandable table rows (Frontend)
+- CSV export automatically includes all external fields
+- Better handling of nested objects (JSON string conversion)
 
 ### v0.4.14
-- ✅ **Multi-Select Status Filter** für bessere Datenfilterung
-- ✅ Verbesserte Pagination und Query-Parameter
+
+> 7 November 2025
+
+- Added: Multi-select status filter for project data retrieval
+- Improved: Better filtering options for project data queries
 
 ### v0.2.0
-- ✅ **Enlyst Trigger Node** hinzugefügt für Webhook-Automation
-- ✅ **Enrichment Completion** Events unterstützt
-- ✅ **API-Key Authentication** für Webhooks
-- ✅ **Projekt-Filter** für spezifische Trigger
+- Added: Enlyst Trigger Node for webhook automation
+- Added: Enrichment Completion event support
+- Added: API-Key authentication for webhooks
+- Added: Project filter for specific triggers
 
 ### v0.1.0
-- ✅ **Enlyst Node** mit vollständiger API-Integration
-- ✅ **Projekt- und Lead-Operationen**
-- ✅ **CSV-Upload/Download**
-- ✅ **Massen-Enrichment** Funktionen
+- Added: Enlyst Node with full API integration
+- Added: Project and Lead operations
+- Added: CSV upload/download functionality
+- Added: Batch enrichment features
