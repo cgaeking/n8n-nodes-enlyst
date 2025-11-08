@@ -159,92 +159,6 @@ Sets up webhooks for an existing project. This is a **prerequisite** for using "
 
 **Note:** This is a simplified alternative to manual webhook configuration via "Create or Update Project".
 
-#### **Delete Project**
-
-Löscht ein bestehendes Projekt vollständig.
-
-**Verwendung:**
-
-- Projekt dauerhaft entfernen
-- Alle zugehörigen Leads werden ebenfalls gelöscht
-
-**Eingaben:**
-
-- `projectId` (erforderlich): ID des zu löschenden Projekts
-
----
-
-#### **Get Project by ID**
-
-Ruft ein spezifisches Projekt anhand seiner ID ab.
-
-**Verwendung:**
-
-- Projektdetails abrufen
-- Projekt-Konfiguration prüfen
-- Basis-URL für andere Operationen erhalten
-
-**Eingaben:**
-
-- `projectId` (erforderlich): ID des Projekts
-
-**Ausgabe:** Vollständige Projektinformationen inkl. Name, Beschreibung, Einstellungen, Erstellungsdatum
-
----
-
-#### **Get Project by Name**
-
-Ruft ein Projekt anhand des Namens ab (erste Übereinstimmung bei mehreren Projekten).
-
-**Verwendung:**
-
-- Projekt-ID anhand des Namens ermitteln
-- Nützlich wenn nur der Name bekannt ist
-
-**Eingaben:**
-
-- `projectName` (erforderlich): Name des Projekts
-
-**Ausgabe:** Projektdetails des ersten gefundenen Projekts mit diesem Namen
-
----
-
-#### **Get Many Projects**
-
-Listet alle verfügbaren Projekte auf.
-
-**Verwendung:**
-
-- Übersicht über alle Projekte erhalten
-- Projekt-IDs für weitere Operationen sammeln
-- Projekt-Auswahl in Workflows
-
-**Ausgabe:** Array aller Projekte mit vollständigen Details
-
----
-
-#### **Prepare Project**
-
-Richtet Webhooks für ein bestehendes Projekt ein. Dies ist **Voraussetzung** für die Verwendung von "Wait for Completion" bei "Enrich Leads".
-
-**Verwendung:**
-
-- Webhook-URL für Enrichment-Benachrichtigungen setzen
-- Automatische Benachrichtigung aktivieren wenn Batch-Enrichment abgeschlossen ist
-- Notwendig für asynchrone Workflows mit Enrichment-Trigger
-
-**Eingaben:**
-
-- `projectId` (erforderlich): ID des vorzubereitenden Projekts
-
-**Automatische Aktionen:**
-
-- Aktiviert "General Webhooks" für das Projekt
-- Setzt `enrichmentWebhookUrl` auf die n8n-Webhook-URL: `{baseUrl}/webhooks/n8n/{projectId}`
-- Ermöglicht die Verwendung des **Enlyst Trigger** für dieses Projekt
-
-**Hinweis:** Dies ist eine vereinfachte Alternative zur manuellen Webhook-Konfiguration über "Create or Update Project".
-
 ---
 
 ### 👥 Lead Actions
@@ -453,7 +367,17 @@ Tested with n8n version 1.0+ and Node.js 18+
 
 ## Version History
 
-### v0.5.6 (Latest)
+### v0.6.0 (Latest)
+
+> 8 November 2025
+
+**Documentation:**
+
+- Added: English documentation as primary language for n8n community standards compliance
+- Added: German translation (README.de.md) with language switcher
+- Improved: Professional multilingual documentation structure
+
+### v0.5.6
 
 > 8 November 2025
 
