@@ -15,20 +15,26 @@
 
 ### **1. Enlyst Node** - API Operations
 
-- **Manage projects** (Create, Retrieve, Update, Delete)
-- **Retrieve lead data** with pagination and multi-status filtering
-- **Find leads** via Google Maps search with geocoding
-- **Add leads** from external sources with custom data
-- **Start bulk enrichment** (all, filtered, single rows)
-- **CSV upload** for new lead lists
-- **CSV download** with status filtering
+**Project Actions:**
+- Create or Update Project
+- Delete Project
+- Get Project by ID
+- Get Project by Name
+- Get Many Projects
+- Prepare Project (webhook setup)
+
+**Lead Actions:**
+- Get Leads (with pagination and multi-status filtering)
+- Enrich Leads (all, filtered, or single rows)
+- Find Leads (Google Maps search with geocoding)
+- Add Leads (import from external sources)
 
 ### **2. Enlyst Trigger** - Webhook Automation
 
-- **Enrichment Completion** - Triggered when bulk enrichment is complete
-- **API-Key Authentication** for secure webhook reception
-- **Project Filter** for specific projects
-- **Enrichment Statistics** as workflow data
+- **On Enrichment Finished** - Triggered when batch enrichment is complete
+- API-Key Authentication for secure webhook reception
+- Project Filter for specific projects
+- Enrichment Statistics as workflow data
 
 ## Installation
 

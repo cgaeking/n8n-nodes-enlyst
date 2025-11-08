@@ -1,6 +1,4 @@
-# 🚀 n8n-nodes-enlyst
-
-# 🚀 n8n-nodes-enlyst
+# 🚀 n8n-nodes-enlyst (DE)
 
 **[🇬🇧 English](README.md)** | **[🇩🇪 Deutsch](README.de.md)**
 
@@ -17,20 +15,28 @@
 
 ### **1. Enlyst Node** - API-Operationen
 
-- **Projekte verwalten** (Erstellen, Abrufen, Aktualisieren, Löschen)
-- **Lead-Daten abrufen** mit Pagination und Multi-Status-Filterung
-- **Leads finden** via Google Maps Suche mit Geocoding
-- **Leads hinzufügen** aus externen Quellen mit Custom Data
-- **Massen-Enrichment** starten (alle, gefiltert, einzelne Rows)
-- **CSV-Upload** für neue Lead-Listen
-- **CSV-Download** mit Status-Filterung
+**Project Actions:**
 
-### **2. Enlyst Trigger** - Webhook Automation
+- Create or Update Project
+- Delete Project
+- Get Project by ID
+- Get Project by Name
+- Get Many Projects
+- Prepare Project (Webhook-Setup)
 
-- **Enrichment Completion** - Wird ausgelöst wenn Massen-Enrichment fertig ist
-- **API-Key Authentication** für sicheren Webhook-Empfang
-- **Projekt-Filter** für spezifische Projekte
-- **Enrichment-Statistiken** als Workflow-Daten
+**Lead Actions:**
+
+- Get Leads (mit Paginierung und Multi-Status-Filterung)
+- Enrich Leads (alle, gefiltert oder einzelne Zeilen)
+- Find Leads (Google Maps-Suche mit Geocoding)
+- Add Leads (Import aus externen Quellen)
+
+### **2. Enlyst Trigger** - Webhook-Automatisierung
+
+- **On Enrichment Finished** - Wird ausgelöst, wenn Batch-Enrichment fertig ist
+- API-Key-Authentifizierung für sichere Webhook-Empfang
+- Projekt-Filter für spezifische Projekte
+- Enrichment-Statistiken als Workflow-Daten
 
 ## Installation
 
