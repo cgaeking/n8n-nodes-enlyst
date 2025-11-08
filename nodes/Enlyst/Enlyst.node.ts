@@ -87,7 +87,10 @@ export class Enlyst implements INodeType {
 			try {
 				if (resource === 'lead') {
 					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
-					const projectId = this.getNodeParameter('projectId', i) as string;
+					// Get projectId only for operations that require it (not for findLeads when addToProject is false)
+					const projectId = (operation === 'getProjectData' || operation === 'enrichLeads') 
+						? this.getNodeParameter('projectId', i) as string 
+						: '';
 					
 					if (operation === 'getProjectData') {
 						const page = this.getNodeParameter('page', i, null) as number | null;
@@ -210,6 +213,121 @@ export class Enlyst implements INodeType {
 							if (!isComplete) {
 								throw new ApplicationError('Enrichment timeout: Process did not complete within 1 hour');
 							}
+						}
+					} else if (operation === 'findLeads') {
+						const credentials = await this.getCredentials('enlystApi');
+						const baseUrl = credentials.baseUrl as string;
+						
+						const searchTerm = this.getNodeParameter('searchTerm', i) as string;
+						const locationType = this.getNodeParameter('locationType', i) as string;
+						const zoom = this.getNodeParameter('zoom', i) as number;
+						const addToProject = this.getNodeParameter('addToProject', i, true) as boolean;
+						
+						let latitude: number;
+						let longitude: number;
+						let locationName: string;
+						
+						// Get coordinates based on location type
+						if (locationType === 'byName') {
+							locationName = this.getNodeParameter('locationName', i) as string;
+							
+							// Geocode the location name to get coordinates
+							const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&limit=1`;
+							console.log('Geocoding location:', locationName, 'URL:', geocodeUrl);
+							
+							const geocodeResponse = await this.helpers.httpRequest({
+								method: 'GET',
+								url: geocodeUrl,
+								headers: {
+									'User-Agent': 'n8n-nodes-enlyst',
+								},
+							}) as IDataObject[];
+							
+							console.log('Geocode response:', JSON.stringify(geocodeResponse));
+							
+							if (!geocodeResponse || geocodeResponse.length === 0) {
+								throw new ApplicationError(`Could not find coordinates for location: ${locationName}. Please check the spelling or use coordinates instead.`);
+							}
+							
+							latitude = parseFloat(geocodeResponse[0].lat as string);
+							longitude = parseFloat(geocodeResponse[0].lon as string);
+							console.log('Geocoded coordinates:', { latitude, longitude });
+						} else {
+							// byCoordinates
+							latitude = this.getNodeParameter('latitude', i) as number;
+							longitude = this.getNodeParameter('longitude', i) as number;
+							locationName = `${latitude}, ${longitude}`;
+						}
+						
+						// Get projectId only if addToProject is true
+						let projectId: string | undefined;
+						if (addToProject) {
+							projectId = this.getNodeParameter('projectId', i) as string;
+						}
+
+						// Search for leads
+						const searchOptions: IHttpRequestOptions = {
+							method: 'POST',
+							url: `${baseUrl}/leads/search-serper`,
+							headers: {
+								'Authorization': `Bearer ${credentials.accessToken}`,
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								query: searchTerm,
+								latitude,
+								longitude,
+								zoom,
+							},
+						};
+
+						const searchResponse = await this.helpers.httpRequest(searchOptions) as IDataObject;
+						const leads = (searchResponse.leads as IDataObject[]) || [];
+
+						// If addToProject is true, add leads to the project
+						if (addToProject && leads.length > 0 && projectId) {
+							const addOptions: IHttpRequestOptions = {
+								method: 'POST',
+								url: `${baseUrl}/leads/add`,
+								headers: {
+									'Authorization': `Bearer ${credentials.accessToken}`,
+									'Accept': 'application/json',
+									'Content-Type': 'application/json',
+								},
+								body: {
+									projectId,
+									leads: leads.map((lead: IDataObject) => ({
+										name: lead.name,
+										website: lead.website || '',
+										address: lead.address || '',
+									})),
+								},
+							};
+
+							const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;
+							
+							responseData = {
+								success: true,
+								searchQuery: searchTerm,
+								location: locationName,
+								coordinates: { latitude, longitude },
+								zoom,
+								leadsFound: leads.length,
+								leadsAdded: addResponse.inserted || 0,
+								leads,
+							};
+						} else {
+							responseData = {
+								success: true,
+								searchQuery: searchTerm,
+								location: locationName,
+								coordinates: { latitude, longitude },
+								zoom,
+								leadsFound: leads.length,
+								leadsAddedToProject: addToProject ? 'Project ID not provided' : false,
+								leads,
+							};
 						}
 					}
 				}

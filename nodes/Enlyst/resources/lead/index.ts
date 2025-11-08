@@ -24,6 +24,12 @@ export const leadDescription: INodeProperties[] = [
 				description: 'Enrich leads (single or bulk enrichment)',
 				action: 'Enrich leads',
 			},
+			{
+				name: 'Find Leads',
+				value: 'findLeads',
+				description: 'Find leads via Google Maps search',
+				action: 'Find leads',
+			},
 		],
 		default: 'getProjectData',
 	},
@@ -322,5 +328,139 @@ export const leadDescription: INodeProperties[] = [
 				property: 'dryRun',
 			},
 		},
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              lead:findLeads                               */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Search Term',
+		name: 'searchTerm',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+			},
+		},
+		required: true,
+		default: '',
+		placeholder: 'e.g., Zahnarzt, Restaurant, Hotel',
+		description: 'What type of business to search for',
+	},
+	{
+		displayName: 'Location Type',
+		name: 'locationType',
+		type: 'options',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+			},
+		},
+		options: [
+			{
+				name: 'By City/Location Name',
+				value: 'byName',
+			},
+			{
+				name: 'By Coordinates',
+				value: 'byCoordinates',
+			},
+		],
+		default: 'byName',
+		description: 'How to specify the search location',
+	},
+	{
+		displayName: 'Location',
+		name: 'locationName',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+				locationType: ['byName'],
+			},
+		},
+		required: true,
+		default: '',
+		placeholder: 'e.g., Berlin, Hamburg, Munich',
+		description: 'City or location to search in',
+	},
+	{
+		displayName: 'Latitude',
+		name: 'latitude',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+				locationType: ['byCoordinates'],
+			},
+		},
+		required: true,
+		default: 52.520008,
+		description: 'Latitude coordinate for search center',
+	},
+	{
+		displayName: 'Longitude',
+		name: 'longitude',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+				locationType: ['byCoordinates'],
+			},
+		},
+		required: true,
+		default: 13.404954,
+		description: 'Longitude coordinate for search center',
+	},
+	{
+		displayName: 'Zoom Level',
+		name: 'zoom',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+			},
+		},
+		required: true,
+		default: 13,
+		description: 'Map zoom level (1-21). Higher = smaller area, more precise results. Recommended: 12-15',
+		typeOptions: {
+			minValue: 1,
+			maxValue: 21,
+		},
+	},
+	{
+		displayName: 'Add Leads to Project',
+		name: 'addToProject',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+			},
+		},
+		default: true,
+		description: 'Whether to automatically add found leads to the project',
+	},
+	{
+		displayName: 'Project ID',
+		name: 'projectId',
+		type: 'string',
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['findLeads'],
+				addToProject: [true],
+			},
+		},
+		default: '',
+		description: 'ID of the project to add leads to',
 	},
 ];
