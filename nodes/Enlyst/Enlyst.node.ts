@@ -27,7 +27,7 @@ export class Enlyst implements INodeType {
 		},
 		documentationUrl: 'https://github.com/cgaeking/n8n-nodes-enlyst#readme',
 		usableAsTool: true,
-		inputs: [NodeConnectionTypes.Main],
+		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [{ name: 'enlystApi', required: true }],
 		webhooks: [
@@ -81,7 +81,8 @@ export class Enlyst implements INodeType {
 	const singleExecutionOps = ['getProjectData', 'enrichLeads'];
 	const shouldRunOnce = resource === 'lead' && singleExecutionOps.includes(operation);
 
-	const itemsToProcess = shouldRunOnce ? [0] : Array.from({ length: items.length }, (_, i) => i);
+	// If no input items, create a single execution (for standalone use)
+	const itemsToProcess = items.length === 0 ? [0] : (shouldRunOnce ? [0] : Array.from({ length: items.length }, (_, i) => i));
 
 	for (const i of itemsToProcess) {
 		try {
