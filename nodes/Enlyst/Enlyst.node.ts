@@ -353,20 +353,34 @@ export class Enlyst implements INodeType {
 									website: website.trim(),
 								}],
 							},
+							ignoreHttpStatusErrors: true, // Don't throw on 400 errors
 						};
 
-						const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;
-						
-						responseData = {
-							success: true,
-							message: addResponse.message || 'Lead added successfully',
-							projectId,
-							company: company.trim(),
-							website: website.trim(),
-							addedCount: addResponse.addedCount || 0,
-							skippedCount: addResponse.skippedCount || 0,
-							duplicatesFound: addResponse.duplicatesFound || 0,
-						};
+						try {
+							const addResponse = await this.helpers.httpRequest(addOptions) as IDataObject;
+							
+							responseData = {
+								success: true,
+								message: addResponse.message || 'Lead processed successfully',
+								projectId,
+								company: company.trim(),
+								website: website.trim(),
+								addedCount: addResponse.addedCount || 0,
+								updatedCount: addResponse.updatedCount || 0,
+								skippedCount: addResponse.skippedCount || 0,
+								duplicatesFound: addResponse.duplicatesFound || 0,
+							};
+						} catch (error) {
+							// Handle duplicate/existing lead gracefully
+							responseData = {
+								success: false,
+								message: error.message || 'Failed to add lead',
+								projectId,
+								company: company.trim(),
+								website: website.trim(),
+								error: error.message,
+							};
+						}
 					}
 				}
 
