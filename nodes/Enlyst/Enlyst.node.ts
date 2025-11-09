@@ -72,7 +72,7 @@ export class Enlyst implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
-	let responseData: IDataObject | undefined;
+	let responseData: IDataObject | IDataObject[] | undefined;
 	const returnData: INodeExecutionData[] = [];
 	const resource = this.getNodeParameter('resource', 0) as string;
 	const operation = this.getNodeParameter('operation', 0) as string;
@@ -119,19 +119,26 @@ export class Enlyst implements INodeType {
 							});
 						}
 						
-						const options: IHttpRequestOptions = {
-							method: 'GET',
-							url: `${baseUrl}/projects/${projectId}/data?${queryParams.toString()}`,
-							headers: {
-								'Authorization': `Bearer ${credentials.accessToken}`,
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-						};
+					const options: IHttpRequestOptions = {
+						method: 'GET',
+						url: `${baseUrl}/projects/${projectId}/data?${queryParams.toString()}`,
+						headers: {
+							'Authorization': `Bearer ${credentials.accessToken}`,
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+					};
 
-						responseData = await this.helpers.httpRequest(options);
-						
-					} else if (operation === 'enrichLeads') {
+					const apiResponse = await this.helpers.httpRequest(options) as IDataObject;
+					
+					// Extract just the leads array from the API response wrapper
+					if (apiResponse.projectData && Array.isArray(apiResponse.projectData)) {
+						responseData = apiResponse.projectData as IDataObject[];
+					} else {
+						responseData = apiResponse;
+					}
+					
+				} else if (operation === 'enrichLeads') {
 						const credentials = await this.getCredentials('enlystApi');
 						const baseUrl = credentials.baseUrl as string;
 						const waitForCompletion = this.getNodeParameter('waitForCompletion', i, false) as boolean;
