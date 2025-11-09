@@ -204,21 +204,27 @@ export class Enlyst implements INodeType {
 								const statsResponse = await this.helpers.httpRequest(statsOptions) as IDataObject;
 								const activeCount = statsResponse.active as number;
 								
-								// Check if there are any active (processing/queued) items
-								if (activeCount === 0) {
-									isComplete = true;
-									// Return all completed data (no page/limit = return all)
-									const allDataOptions: IHttpRequestOptions = {
-										method: 'GET',
-										url: `${baseUrl}/projects/${projectId}/data`,
-										headers: {
-											'Authorization': `Bearer ${credentials.accessToken}`,
-											'Accept': 'application/json',
-											'Content-Type': 'application/json',
-										},
-									};
-									responseData = await this.helpers.httpRequest(allDataOptions);
+							// Check if there are any active (processing/queued) items
+							if (activeCount === 0) {
+								isComplete = true;
+								// Return all completed data (no page/limit = return all)
+								const allDataOptions: IHttpRequestOptions = {
+									method: 'GET',
+									url: `${baseUrl}/projects/${projectId}/data`,
+									headers: {
+										'Authorization': `Bearer ${credentials.accessToken}`,
+										'Accept': 'application/json',
+										'Content-Type': 'application/json',
+									},
+								};
+								const apiResponse = await this.helpers.httpRequest(allDataOptions) as IDataObject;
+								// Extract leads array from wrapper object
+								if (apiResponse.projectData && Array.isArray(apiResponse.projectData)) {
+									responseData = apiResponse.projectData as IDataObject[];
+								} else {
+									responseData = apiResponse;
 								}
+							}
 							}
 							
 							if (!isComplete) {
