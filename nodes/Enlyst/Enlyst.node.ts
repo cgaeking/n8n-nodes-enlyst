@@ -72,21 +72,27 @@ export class Enlyst implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
-		let responseData: IDataObject | undefined;
-		const returnData: INodeExecutionData[] = [];
-		const resource = this.getNodeParameter('resource', 0) as string;
-		const operation = this.getNodeParameter('operation', 0) as string;
+	let responseData: IDataObject | undefined;
+	const returnData: INodeExecutionData[] = [];
+	const resource = this.getNodeParameter('resource', 0) as string;
+	const operation = this.getNodeParameter('operation', 0) as string;
 
-		for (let i = 0; i < items.length; i++) {
-			try {
-				if (resource === 'lead') {
-					const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
-					// Get projectId only for operations that require it (not for findLeads when addToProject is false)
-					const projectId = (operation === 'getProjectData' || operation === 'enrichLeads' || operation === 'addLeads') 
-						? this.getNodeParameter('projectId', i) as string 
-						: '';
-					
-					if (operation === 'getProjectData') {
+	// Operations that should run only once, not per item
+	const singleExecutionOps = ['getProjectData', 'enrichLeads'];
+	const shouldRunOnce = resource === 'lead' && singleExecutionOps.includes(operation);
+
+	const itemsToProcess = shouldRunOnce ? [0] : Array.from({ length: items.length }, (_, i) => i);
+
+	for (const i of itemsToProcess) {
+		try {
+			if (resource === 'lead') {
+				const enrichmentType = operation === 'enrichLeads' ? this.getNodeParameter('enrichmentType', i) as string : '';
+				// Get projectId only for operations that require it (not for findLeads when addToProject is false)
+				const projectId = (operation === 'getProjectData' || operation === 'enrichLeads' || operation === 'addLeads') 
+					? this.getNodeParameter('projectId', i) as string 
+					: '';
+				
+				if (operation === 'getProjectData') {
 						const page = this.getNodeParameter('page', i, null) as number | null;
 						const limit = this.getNodeParameter('limit', i, null) as number | null;
 						const statuses = this.getNodeParameter('status', i, []) as string[];
